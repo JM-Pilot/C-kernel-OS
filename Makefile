@@ -61,8 +61,10 @@ qemu-vnc:
 	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial stdio -display vnc=:1 -d int
 
 cl:
-	@echo -n "lines of code in total: "
+	@echo -n "lines of true code: "
 	@grep -R "" src/*.c src/*.s src/*.asm include/*.h | wc -l
+	@echo -n "lines of code in total: "
+	@grep -R "" src/*.c src/*.s src/*.asm include/*.h Makefile iso/boot/grub/grub.cfg scripts/*.sh | wc -l
 
 mrproper:
 	@echo "Erasing all data!"
