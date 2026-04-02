@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 double uptime = 0.0;
-const char *ver = "CkOS Beta Version 0.02 for i386 (x86-32) at 10th March 2026";
+const char *ver = "CkOS Beta Version 0.03 for i386 (x86-32) at 2nd April 2026";
 const char *logo =
 " _   _  _\n"
 "/ |/| ||_`\n"
@@ -17,3 +17,5 @@ char serial_out = false;
 volatile char kbc = 0;
 // i'm sorry fellow C developers for this shitty solution but i just have to do this
 uint64_t uptime_ticks = 0;
+
+unsigned char loglevel = 7; // You don't want to recompile the kernel just because you don't have all the info to debug an error

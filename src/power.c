@@ -11,16 +11,16 @@ static inline void outw(uint16_t port, uint16_t value) {
 }
 
 int poweroff() {
-	printk("power: The system will shut down!");
+	printk(4, "power: The system will shut down!");
 	__asm__ volatile ("cli");
-	printk("power: Disabled interrupts");
+	printk(6, "power: Disabled interrupts");
 	serial_shutdown();
-	printk("Disabled serial");
+	printk(6, "Disabled serial");
 	pic_shutdown();
-	printk("Disabled PIC");
+	printk(6, "Disabled PIC");
 	pit_shutdown();
-	printk("Disabled PIT");
-	printk("power: Powering off");
+	printk(6, "Disabled PIT");
+	printk(4, "power: Powering off");
 	outw(0x604, 0x2000); // new QEMU
 	outw(0xB004, 0x2000); // bochs and old QEMU
 	outw(0x4004, 0x3400); // virtualbox (ew)
@@ -29,7 +29,7 @@ int poweroff() {
 }
 
 int reboot() {
-	printk("power: Rebooting");
+	printk(4, "power: Rebooting");
 	outb(0x64, 0xFE);
 	return 1;
 }

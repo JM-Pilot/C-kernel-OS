@@ -34,25 +34,29 @@ void parse_cmdline(char *input) {
 	char *a; char *b = input;
 	while ((a = __split_cmdline(&b))) {
 		if (*a == '\0') continue;
-		printk("Received command line argument: %s", a);
+		printk(6, "Received command line argument: %s", a);
 		// FIXME: serial input doesn't work!
 		/*if (strcmp(a, "s_in") == 0) {
 			serial_in = true;
 			printk("Serial input enabled");
-		} else*/ if (strcmp(a, "s_out") == 0) {
+		} else*/ 
+		if (strcmp(a, "shut_up") == 0) {
+			printk(7, "Shh");
+			loglevel = 2;
+		} else if (strcmp(a, "s_out") == 0) {
 			serial_out = true;
-			printk("Serial output enabled");
+			printk(6, "Serial output enabled");
 		} else {
-			printk("Invalid command line argument %s, ignoring", a);
+			printk(2, "Invalid command line argument %s, ignoring", a);
 		}
 	}
 }
 
 extern void _start();
 void debug_info_print() {
-	printk(ver); printk("Build #%d by %s", BUILD_NUMBER, CKOS_BLD);
-	printk("Kernel entry offset: %x, image offset: %x", _start, 1024*1024);
-	printk("Made by orca.pet3910YT with %s", "\x03");
+	printk(6, ver); printk(6, "Build #%d by %s", BUILD_NUMBER, CKOS_BLD);
+	printk(6, "Kernel entry offset: %x, image offset: %x", _start, 1024*1024);
+	printk(7, "Made by orca.pet3910YT with %s", "\x03");
 }
 
 void kmain(int magic, mbinfo_t *mbi) {
@@ -68,49 +72,49 @@ void kmain(int magic, mbinfo_t *mbi) {
 	//puts(string_thing);
 	debug_info_print();
 	serial_init();
-	printk("Initialized serial at 0x3F8 (COM1)");
-	printk("Multiboot flags: %x", mbi->flags);
+	printk(6, "Initialized serial at 0x3F8 (COM1)");
+	printk(6, "Multiboot flags: %x", mbi->flags);
 	char *cmdline = NULL;
 	//char *strings[16];
 	// FIXME: magic is 0
 	//if (magic != 0x1BADB002) panic("Incorrect Multiboot 1 magic number! Got 0x%x, should be 0x1BADB002");
 	if (mbi->flags & (1 << 2)) {
 		cmdline = (char*)mbi -> cmdline;
-		printk("Command line: %s", cmdline);
+		printk(5, "Command line: %s", cmdline);
 	}
-	printk("---BEGIN Command line info---");
+	printk(6, "---BEGIN Command line info---");
 	parse_cmdline(cmdline);
-	printk("Parsed command line provided by bootloader");
-	printk("--- END Command line info ---");
+	printk(4, "Parsed command line provided by bootloader");
+	printk(6, "--- END Command line info ---");
 	kb_init();
-	printk("Initialized PS/2 BIOS keyboard");
+	printk(6, "Initialized PS/2 BIOS keyboard");
 	gdt_init();
-	printk("GDT initialized");
+	printk(6, "GDT initialized");
 	pic_remap();
-	printk("Remapped the PIC");
+	printk(6, "Remapped the PIC");
 	init_idt();
-	printk("IDT initialized");
+	printk(6, "IDT initialized");
 	//unsigned int strn = (unsigned int)split(cmdline, ' ', strings, 15);
 	//for (unsigned int i = 0; /*i < (sizeof(strings)/sizeof(strings[0]))*/ i < strn; i++) {
 	//	printk("cmdline of %x: %s", i, strings[i]);
 	//}
 	__asm__ volatile ("sti");
-	printk("Set interrupts");
+	printk(6, "Set interrupts");
 	init_pit();
-	printk("Initialized PIT at 1.43 KHz");
-	printk("isr6(): %x", isr6);
-	printk("isr0(): %x", isr0);
-	printk("CPU: %s", get_cpu_vendor());
+	printk(6, "Initialized PIT at 1.43 KHz");
+	printk(7, "isr6(): %x", isr6);
+	printk(7, "isr0(): %x", isr0);
+	printk(7, "CPU: %s", get_cpu_vendor());
 	// get_cpu_vendor in cpu.asm is a simple assembly function that uses cpuid with eax = 0
 	// which puts the max eax value in eax and the CPU vendor in ebx, edx and ecx in order.
 	// technically i don't think you have to call it more than once but never too safe :P
 	char brand[13];
-	printk("---> %s", get_cpu_brand(brand));
-	printk("Hello, World!");
+	printk(7, "---> %s", get_cpu_brand(brand));
+	printk(7, "Hello, World!");
 	set_color(0x0F);
 	printf("%s\n", logo); // globals.h:4
 	set_color(0x07);
-	printk("Welcome to CkOS!");
+	printk(0, "Welcome to CkOS!");
 	//putc(scancode_to_c(kb_get_scancode()));
 	//panic("This PC is ass."); // compile with this uncommented to prank people :)
 	char command[256] = {0};
@@ -190,8 +194,8 @@ void kmain(int magic, mbinfo_t *mbi) {
 				//__asm__ volatile ("int $0");
 				__asm__ volatile ("int3");
 			} else if (strcmp(command, "cpuinfo") == 0) {
-				printk("CPU vendor: '%s', friendly name '%s'", get_cpu_vendor(), get_cpu_vendor_user());
-				printk("CPU brand: '%s'", brand);
+				printf("CPU vendor: '%s', friendly name '%s'\n", get_cpu_vendor(), get_cpu_vendor_user());
+				printf("CPU brand: '%s'\n", brand);
 			} else if (strcmp(command, "oopstest") == 0) {
 				oops("User-triggered oops");
 			} else if (index > 0) { // lastchar

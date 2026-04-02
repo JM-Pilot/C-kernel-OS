@@ -20,7 +20,7 @@ static void idt_set_gate(uint8_t n, uint32_t b, uint16_t sel, uint8_t flags) {
 }
 
 void init_idt() {
-	printk("idt: idt_entry_t: %x", sizeof(idt_entry_t));
+	printk(7, "idt: idt_entry_t: %x", sizeof(idt_entry_t));
 	idt_ptr.limit = sizeof(idt_entry_t)*256-1;
 	idt_ptr.base = (uint32_t)&idt_ents;
 	for (int i = 0; i < 256; i++) {

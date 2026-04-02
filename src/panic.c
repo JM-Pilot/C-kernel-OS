@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdarg.h>
 #include <idt.h> // regs_t
+#include <globals.h> // loglevel
 
 // `__panic_` variables. they are defined here to avoid putting them in the stack
 
@@ -28,6 +29,8 @@ regs_t *regs;
 int regs_available = 0;
 
 void oops(const char *msg, ...) {
+	char log_old = loglevel;
+	loglevel = 7;
 	__asm__ volatile ("cli");
 	__oops_pre = "Oops! <";
 	__oops_post = "> - beware!";
@@ -47,21 +50,21 @@ void oops(const char *msg, ...) {
         while (*msg && __oops_i < 1023) __oops_buf[__oops_i++] = *msg++;
         while (*__oops_post && __oops_i < 1023) __oops_buf[__oops_i++] = *__oops_post++;
         __oops_buf[__oops_i] = '\0';
-        cprintk(__oops_buf, params);
+        cprintk(0, __oops_buf, params);
         // TODO: stack trace of function addresses + distinguish from regular values
-        printk("Oopses triggered: %d", oopses);
+        printk(0, "Oopses triggered: %d", oopses);
 	if (regs_available) {
-		printk("EAX: %x EBX: %x ECX: %x EDX: %x", regs->eax, regs->ebx, regs->ecx, regs->edx);
-		printk("At %x:%x accessing %x:%x, EBP: %x, ESP: %x", regs->cs, regs->eip, regs->ds, regs->edi, regs->ebp, regs->esp);
-		printk("EFLAGS: %x", regs->eflags);
-		printk("Code: %x %x %x %x", *(int*)regs->eip, *((int*)(regs->eip)+4), *((int*)(regs->eip)+8), *((int*)(regs->eip)+12));
+		printk(0, "EAX: %x EBX: %x ECX: %x EDX: %x", regs->eax, regs->ebx, regs->ecx, regs->edx);
+		printk(0, "At %x:%x accessing %x:%x, EBP: %x, ESP: %x", regs->cs, regs->eip, regs->ds, regs->edi, regs->ebp, regs->esp);
+		printk(0, "EFLAGS: %x", regs->eflags);
+		printk(0, "Code: %x %x %x %x", *(int*)regs->eip, *((int*)(regs->eip)+4), *((int*)(regs->eip)+8), *((int*)(regs->eip)+12));
 	}
         // second header (or the end header)
         while (*__oops__pre && __oops_j < 1023) __oops_buf2[__oops_j++] = *__oops__pre++;
         while (*msg2 && __oops_j < 1023) __oops_buf2[__oops_j++] = *msg2++;
         while (*__oops__post && __oops_j < 1023) __oops_buf2[__oops_j++] = *__oops__post++;
         __oops_buf2[__oops_j] = '\0'; // NULL terminate
-        cprintk(__oops_buf2, params);
+        cprintk(0, __oops_buf2, params);
         va_end(params);
 	if (oopses >= 3) {
 		panic("Oopsed three times");
@@ -69,14 +72,16 @@ void oops(const char *msg, ...) {
 	}
 	set_color(0x07); oopsing = 0;
 	__asm__ volatile ("sti");
+	loglevel = log_old;
 }
 
-// panic rewrites: 4
+// panic rewrites: 5
 // please increment the above number
 // in an event of a big update to panic
 
 void panic(const char *msg, ...) {
 	__asm__ volatile ("cli");
+	loglevel = 0; // don't even bother saving the old value. why? panic never returns?
 	/*puts("\n[ 0.000000] KERNEL PANIC: ");
 	puts(msg);
 	puts(" system halted!\n");
@@ -90,7 +95,7 @@ void panic(const char *msg, ...) {
 	printk(msg); // i trust you are mature and won't put weird shit on purpose into the msg buffer
 	printk("]---");*/
 	if (panicking) {
-		printk("**** DOUBLE PANIC - SYSTEM HALTED ****");
+		printk(0, "**** DOUBLE PANIC - SYSTEM HALTED ****");
 		__asm__ volatile ("cli; hlt");
 	}
 	panicking = 1;
@@ -103,23 +108,23 @@ void panic(const char *msg, ...) {
 	while (*msg && __panic_i < 1023) __panic_buf[__panic_i++] = *msg++;
 	while (*__panic_post && __panic_i < 1023) __panic_buf[__panic_i++] = *__panic_post++;
 	__panic_buf[__panic_i] = '\0';
-	cprintk(__panic_buf, params);
+	cprintk(0, __panic_buf, params);
 	// TODO: stack trace of function addresses + distinguish from regular values
-	printk("---BEGIN Panic info---");
-	if (oopses > 0) printk("Oopses triggered: %d", oopses);
+	printk(0, "---BEGIN Panic info---");
+	if (oopses > 0) printk(0, "Oopses triggered: %d", oopses);
 	if (regs_available) {
-		printk("EAX: %x EBX: %x ECX: %x EDX: %x", regs->eax, regs->ebx, regs->ecx, regs->edx);
-		printk("At %x:%x accessing %x:%x, EBP: %x, ESP: %x", regs->cs, regs->eip, regs->ds, regs->edi, regs->ebp, regs->esp);
-		printk("EFLAGS: %x", regs->eflags);
-		printk("Code: %x %x %x %x", *(int*)regs->eip, *((int*)(regs->eip)+4), *((int*)(regs->eip)+8), *((int*)(regs->eip)+12));
+		printk(0, "EAX: %x EBX: %x ECX: %x EDX: %x", regs->eax, regs->ebx, regs->ecx, regs->edx);
+		printk(0, "At %x:%x accessing %x:%x, EBP: %x, ESP: %x", regs->cs, regs->eip, regs->ds, regs->edi, regs->ebp, regs->esp);
+		printk(0, "EFLAGS: %x", regs->eflags);
+		printk(0, "Code: %x %x %x %x", *(int*)regs->eip, *((int*)(regs->eip)+4), *((int*)(regs->eip)+8), *((int*)(regs->eip)+12));
 	}
-	printk("--- END Panic info ---");
+	printk(0, "--- END Panic info ---");
 	// second header (or the end header)
 	while (*__panic__pre && __panic_j < 1023) __panic_buf2[__panic_j++] = *__panic__pre++;
 	while (*msg3 && __panic_j < 1023) __panic_buf2[__panic_j++] = *msg3++;
 	while (*__panic__post && __panic_j < 1023) __panic_buf2[__panic_j++] = *__panic__post++;
 	__panic_buf2[__panic_j] = '\0'; // NULL terminate
-	cprintk(__panic_buf2, params);
+	cprintk(0, __panic_buf2, params);
 	va_end(params);
 	__asm__ volatile ("hlt");
 }

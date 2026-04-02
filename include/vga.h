@@ -9,7 +9,7 @@ void set_ftimestamp(double timestamp, char *buf);
 int putc(int c);
 int puts(const char *s);
 int print(const char *s, int length); // this can work, but i wouldn't use it if i were you
-int printk(const char *str, ...);
+int printk(unsigned int pass_loglevel, const char *str, ...);
 int printf(const char *restrict str, ...);
-int cprintk(const char *str, va_list params);
+int cprintk(unsigned int pass_loglevel, const char *str, va_list params);
 #endif

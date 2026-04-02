@@ -1,5 +1,5 @@
-CCFLAGS = -O3 -target i386-elf -fno-pie -fno-pic -Wunused -Wall -Wextra
-CCFLAGSC = -O3 -ffreestanding -target i386-elf -fno-exceptions -fno-stack-protector -fno-align-functions -fno-pie -fno-pic -fno-unwind-tables -fno-asynchronous-unwind-tables -I include -nostdlib -Wall -Wextra -fno-ident -Wunused
+CCFLAGS = -target i386-elf -fno-pie -fno-pic -Wunused -Wall -Wextra
+CCFLAGSC = -ffreestanding -target i386-elf -fno-exceptions -fno-stack-protector -fno-align-functions -fno-pie -fno-pic -fno-unwind-tables -fno-asynchronous-unwind-tables -I include -nostdlib -Wall -Wextra -fno-ident -Wunused
 SRC_C := $(wildcard src/*.c)
 SRC_S := $(wildcard src/*.s)
 SRC_ASM := $(wildcard src/*.asm)
@@ -59,6 +59,10 @@ qemu:
 qemu-vnc:
 	@echo "Running in QEMU (VNC 1)"
 	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial stdio -display vnc=:1 -d int
+
+qemu-debug:
+	@echo "Running in QEMU (highly debugged)"
+	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial stdio -d int,cpu,out_asm
 
 cl:
 	@echo -n "lines of true code: "

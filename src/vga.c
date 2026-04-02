@@ -242,7 +242,8 @@ int printf(const char *restrict format, ...) {
 }
 
 // no more than 1004 chars, thanks
-int printk(const char* str, ...) {
+int printk(unsigned int pass_loglevel, const char* str, ...) {
+	if (pass_loglevel > loglevel) return -1;
 	va_list params;
 	va_start(params, str);
 	char buf[1024] = {0};
@@ -260,7 +261,8 @@ int printk(const char* str, ...) {
 	//sputs(buf); // this relies on early serial logging. DO NOT USE printk BEFORE INITIALIZING SERIAL!
 }
 
-int cprintk(const char *str, va_list params) {
+int cprintk(unsigned int pass_loglevel, const char *str, va_list params) {
+	if (pass_loglevel > loglevel) return -1;
 	char buf[1024] = {0};
 	set_ftimestamp(uptime, buf);
 	int i = strlen(buf);
