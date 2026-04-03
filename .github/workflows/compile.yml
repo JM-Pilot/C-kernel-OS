@@ -16,6 +16,8 @@ jobs:
     - name: chmod
       run: chmod +x scripts/*.sh
     - name: installpkg
-      run: sudo apt install nasm xorriso clang lld
+      run: sudo apt install nasm xorriso clang lld qemu-system-x86
     - name: make
       run: sh -c "make cl; make"
+    - name: quicktest
+      run: qemu-system-i386 -cdrom build/boot.iso -nographic -boot order=dca
