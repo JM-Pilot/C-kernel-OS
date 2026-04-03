@@ -20,4 +20,4 @@ jobs:
     - name: make
       run: sh -c "make cl; make -j$(nproc)"
     - name: quicktest
-      run: timeout 30s bash -c "qemu-system-i386 -cdrom build/boot.iso -nographic -boot order=dca || true"
+      run: timeout 30s bash -c "! qemu-system-i386 -cdrom build/boot.iso -nographic -boot order=dca"
