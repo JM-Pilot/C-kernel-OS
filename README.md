@@ -3,6 +3,11 @@ This is CkOS, which stands for C kernel OS.
 
 The features in this OS are... pretty lacking, but that'll be fixed over time.
 
+## Build requirements
+- `clang`
+- `binutils-i686-linux-gcc`
+- `make`
+
 ## Rules for feature and pull requests
 - The request may not contain slurs of any kind or self-promotion.
 - Profanity is allowed, but keep it in sane amounts.
