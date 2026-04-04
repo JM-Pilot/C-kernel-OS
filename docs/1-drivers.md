@@ -76,6 +76,8 @@ Serial is initialized with `serial_init()`. The divisor determines the final bau
 The main reason why CkOS 0.02 doesn't support serial input is because input methods are being shifted into interrupt-based input instead of poll-based methods.
 
 Fun fact, it is not actually bad design to `printk()` to VGA even in serial-only mode, at least not until device detection phases are implemented. This is because the VGA text buffer is just physical memory. Nothing bad happens if you just write data there.
+
+The driver goal (graphics) is misleading. There is no graphics. At least not yet. The driver is purely for text mode, without it nothing would display.
 </details>
 
 ## Port
