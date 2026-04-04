@@ -56,6 +56,8 @@ You need column and row variables which can't go higher than 80 and 25 respectiv
 These are then set to the hardware cursor position by sending 4 bytes to ports 0x3D4 and 0x3D5.
 
 As of CkOS 0.02, a heart is printed by leveraging Codepage 737. That's achieved with 0x03, which in modern terminal emulators just prints nothing or a gibberish character. Those use UTF-8 with regular ANSI instead.
+
+The driver goal (graphics) is misleading. There is no graphics. At least not yet. The driver is purely for text mode, without it nothing would display.
 </details>
 
 ## Power
@@ -76,8 +78,6 @@ Serial is initialized with `serial_init()`. The divisor determines the final bau
 The main reason why CkOS 0.02 doesn't support serial input is because input methods are being shifted into interrupt-based input instead of poll-based methods.
 
 Fun fact, it is not actually bad design to `printk()` to VGA even in serial-only mode, at least not until device detection phases are implemented. This is because the VGA text buffer is just physical memory. Nothing bad happens if you just write data there.
-
-The driver goal (graphics) is misleading. There is no graphics. At least not yet. The driver is purely for text mode, without it nothing would display.
 </details>
 
 ## Port
