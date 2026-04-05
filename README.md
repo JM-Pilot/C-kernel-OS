@@ -3,6 +3,8 @@ This is CkOS, which stands for C kernel OS.
 
 The features in this OS are... pretty lacking, but that'll be fixed over time.
 
+[![Compile CkOS](https://github.com/orca-pet3910YT/C-kernel-OS/actions/workflows/compile.yml/badge.svg)](https://github.com/orca-pet3910YT/C-kernel-OS/actions/workflows/compile.yml)
+
 ## Build requirements
 - `clang`
 - `binutils-i686-linux-gcc`
