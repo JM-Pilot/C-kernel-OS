@@ -9,4 +9,5 @@ struct cpufreq_s {
 	unsigned int bus;
 };
 struct cpufreq_s get_cpu_clk();
+int get_cpu_clk_d();
 #endif

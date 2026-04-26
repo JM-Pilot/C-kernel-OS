@@ -54,7 +54,7 @@ clean:
 
 qemu:
 	@echo "Running in QEMU"
-	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial stdio
+	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial stdio -cpu host -enable-kvm
 
 qemu-vnc:
 	@echo "Running in QEMU (VNC 1)"
