@@ -59,6 +59,8 @@ void debug_info_print() {
 	printk(7, "Made by orca.pet3910YT with %s", "\x03");
 }
 
+struct cpufreq_s *cpufreq;
+
 void kmain(int magic, mbinfo_t *mbi) {
 	(void)magic;
 	//volatile char* video = (volatile char*)0xB8000;
@@ -196,6 +198,9 @@ void kmain(int magic, mbinfo_t *mbi) {
 			} else if (strcmp(command, "cpuinfo") == 0) {
 				printf("CPU vendor: '%s', friendly name '%s'\n", get_cpu_vendor(), get_cpu_vendor_user());
 				printf("CPU brand: '%s'\n", brand);
+				struct cpufreq_s _temp = get_cpu_clk();
+				*cpufreq = _temp;
+				printf("CPU clock speeds (CPUID EAX=16h):\nBase: %d MHz, max: %d MHz, Bus: %d MHz\n", cpufreq->base, cpufreq->max, cpufreq->bus);
 			} else if (strcmp(command, "oopstest") == 0) {
 				oops("User-triggered oops");
 			} else if (index > 0) { // lastchar

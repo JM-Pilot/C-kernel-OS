@@ -1,6 +1,7 @@
 #include <cpu.h>
 #include <string.h>
 #include <cpuid.h> // first ever header outside CkOS to be included!
+#include <vga.h>
 
 char *get_cpu_vendor_user() {
 	char *vendor = get_cpu_vendor();
@@ -54,4 +55,16 @@ char *get_cpu_brand(char buffer[]) {
 	memcpy(buffer, r, sizeof(r));
 	buffer[sizeof(r)] = '\0';
 	return buffer;
+}
+
+struct cpufreq_s get_cpu_clk() {
+	unsigned int r[4];
+	struct cpufreq_s cpufreq;
+	__cpuid(0x16, r[0], r[1], r[2], r[3]);
+	cpufreq.base = r[0];
+	cpufreq.max = r[1];
+	cpufreq.bus = r[2];
+	// FIXME: what's the better option without measuring manually (lazy way)?
+	//printk(6, "cpu_user: data: %d %d %d %d", r[0], r[1], r[2], r[3]);
+	return cpufreq;
 }
