@@ -9,6 +9,10 @@ The features in this OS are... pretty lacking, but that'll be fixed over time.
 - `clang`
 - `binutils-i686-linux-gcc`
 - `make`
+- `nasm`
+- `xorriso`
+- `grub-common`
+- `grub-pc-bin`
 
 ## Rules for feature and pull requests
 - The request may not contain slurs of any kind or self-promotion.
