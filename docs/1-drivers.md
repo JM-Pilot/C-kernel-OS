@@ -91,7 +91,8 @@ Fun fact, it is not actually bad design to `printk()` to VGA even in serial-only
   
 Again, not much to talk about - you use `outb()` to output a byte and `inb()` to read a byte from a specified port.
 
-Those functions translate into inline assembly with the actual instructions, `outb` and `inb`.
+Those functions translate into inline assembly with the actual instructions, `outb` and `inb`. There are also their `outw` and `inw` for 16-bit words as well as  `outl` and `inl` for longs.
+In NASM, those are just `out` and `in`.
 </details>
 
 ## CPU
