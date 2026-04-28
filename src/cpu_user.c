@@ -77,5 +77,5 @@ unsigned int get_cpu_clk_d() {
 	if (!r[0]) return 3911;
 	printk(6, "cpu_user: %d %d %d %d | %d %d %d %d", r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7]);
 	// does this even fucking work?
-	return ((r[2]/1000000)*r[1])/r[0];
+	return (r[2]*r[1])/(r[0]*1000000);
 }
