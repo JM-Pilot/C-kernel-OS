@@ -58,7 +58,7 @@ qemu:
 
 qemu-vnc:
 	@echo "Running in QEMU (VNC 1)"
-	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial stdio -display vnc=:1 -d int
+	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial stdio -display vnc=:0 -d int
 
 qemu-debug:
 	@echo "Running in QEMU (highly debugged)"
