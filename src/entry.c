@@ -201,13 +201,8 @@ void kmain(int magic, mbinfo_t *mbi) {
 				struct cpufreq_s _temp = get_cpu_clk();
 				*cpufreq = _temp;
 				printf("CPU clock speeds (CPUID EAX=16h):\nBase: %d MHz, max: %d MHz, Bus: %d MHz\n", cpufreq->base, cpufreq->max, cpufreq->bus);
-<<<<<<< Updated upstream
-				int clk_d = get_cpu_clk_d();
-				printf("TSC-based clock speed: %s\n", (clk_d == -1) ? "N/A" : clk_d);
-=======
 				unsigned int clk_d = get_cpu_clk_d();
 				printf("TSC-based clock speed: %d\n", clk_d);
->>>>>>> Stashed changes
 			} else if (strcmp(command, "oopstest") == 0) {
 				oops("User-triggered oops");
 			} else if (index > 0) { // lastchar

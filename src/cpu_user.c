@@ -73,7 +73,7 @@ unsigned int get_cpu_clk_d() {
 	unsigned int r[8];
 	__cpuid(0x15, r[0], r[1], r[2], r[3]);
 	__cpuid(0x80000007, r[4], r[5], r[6], r[7]);
-	if (!((r[7] & 128) >> 7)) return 3910;
+	if (!(r[7] & (1u << 8))) return 3910;
 	if (!r[0]) return 3911;
 	printk(6, "cpu_user: %d %d %d %d | %d %d %d %d", r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7]);
 	// does this even fucking work?
