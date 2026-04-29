@@ -38,22 +38,3 @@ This is almost exactly what Linux already does. You can see the header saying si
 
 ## Drivers
 (See ./1-drivers.md)
-
-## Shell Commands
-hello: say hello to the world
-
-poweroff: turn the system off (QEMU only)
-
-reboot: restart the system
-
-halt: halt the CPU putting the entire system to a freeze
-
-help: display the help message
-
-logo: display the logo
-
-ver: display the version
-
-clear: clear the screen
-
-panictest: test the panic functionality
