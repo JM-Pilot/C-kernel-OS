@@ -93,3 +93,19 @@ Again, not much to talk about - you use `outb()` to output a byte and `inb()` to
 
 Those functions translate into inline assembly with the actual instructions, `outb` and `inb`.
 </details>
+
+## CPU
+<details>
+<summary>Click for details</summary>
+This pseudo-driver is just getters, where:
+  
+- `struct cpufreq_s get_cpu_clk(void)`: gets CPU clock speeds for CPUs that support CPUID 16h, like base, max and bus
+
+- `unsigned int get_cpu_clk_d(void)`: attempts to get the CPU clock via TSC
+
+- `char *get_cpu_brand(char buffer[])`: gets the full brand string, example: `Intel(R) Core(TM) i5-6600K @ 3.500 GHz`
+
+- `void get_cpu_vendor(void)`: saves the CPU vendor in a 13-byte string (12 bytes + NUL)
+
+- `char *get_cpu_vendor_user(void)`: returns the friendly CPU vendor
+</details>
