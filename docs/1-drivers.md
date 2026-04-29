@@ -29,13 +29,17 @@ or released.
 <details>
 <summary>Click for details</summary>
 
-This is a rather boring driver. The clock is set by default to 1.43 kilohertz or 1429 hertz. You initialize this driver by calling `init_pit()`.
+This is a rather boring driver. The clock is set by default to 10 kilohertz or 10000 hertz. You initialize this driver by calling `init_pit()`.
 
 Before the PIT is initialized, clock behavior is undefined. Usually it's initialized to ~18.1 hertz, but it is not a reliable standard.
 
-The clock is counted in not a very reliable way - the FPU is used every millisecond when the clock ticks, so it sometimes causes the double to be filled with 9s due to floating point error.
+Recently, the uptime counter was fixed. The PIT initializes at an equal 10 KHz as mentioned above. If the uptime you see doesn't increase, it's likely because you forgot to call `void retrieve_uptime(void)`.
 
-Likely this can be fixed by instead incrementing a global *tick* counter and calculating the time when printing.
+The PIT increments a single value, `uptime_ticks`. The uptime is calculated by multiplying ticks by 0.00001 (seconds between a tick).
+
+The reason it's better to multiply by the float than divide by the Hz is because that triggers a compiler-defined helper (`__udivdi2`), and that comes from libgcc. The problem is: how to make that libgcc layer easily usable on any device, ARM or not? I won't.
+
+While libgcc is an external library, it's not inherently bad to link against it. However, that does introduce cross-compilation problems. So, I decided it's better to multiply instead and get the same result.
 </details>
 
 ## Graphics
