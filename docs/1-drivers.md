@@ -8,6 +8,7 @@ But the driver list is as follows:
 - power: Power modes
 - serial: Serial I/O
 - port: Raw PMIO
+- cpu: CPU info getters
 
 ## Keyboard
 <details>
