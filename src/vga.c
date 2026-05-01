@@ -7,6 +7,7 @@
 #include <vga.h>
 #include <stdarg.h>
 #include <limits.h>
+#include <pit.h>
 
 /* VGA table of colors
 0 - black
@@ -78,12 +79,12 @@ void scroll_once() {
 	for (int i = 0; i < 80; i++) {
 		buffer[24*80+i] = (color << 8) + 0x20;
 	}
-
 	return;
 }
 
 int putc(int c) {
 	if (c == -1) return -1;
+	if (!c) return 0;
 	//set_color(c); // don't uncomment unless you love unicorn puke
 	if (c == '\n') {
 		col = 0; row++;
@@ -94,11 +95,13 @@ int putc(int c) {
 			while (buffer[(row*80+col)-1] == 0x0720 && col != 0) {
 				col--;
 			}*/ // text editor style
-		} else if (col == 0 && row == 0) {
 			return 0;
-		} else if (col > 2) {
+		} else if (col > 0 && row >= 0 /*2*/) {
 			col--; buffer[row*80+col] = (color << 8) | ' ';
-			if (serial_out) sputc(c);
+			if (serial_out) sputs("\b \b");
+		} else if (col == 0 && row > 0) {
+			col = 79; row--;
+			buffer[row*80+col] = (color << 8) | ' ';
 		}
 	} else if (c == 0x1E) { // up
 		return 0;
@@ -112,8 +115,9 @@ int putc(int c) {
 		return 0;
 	} else if (c == '\t') {
 		for (int i = 0; i < tab_indent; i++) {
-			putc(' '); if (serial_out) sputc(' ');
+			putc(' '); //if (serial_out) sputc(' ');
 		}
+		if (serial_out) sputc('\t');
 	} else {
 		buffer[row*80+col] = (color << 8) | c; col++;
 		if (serial_out) sputc(c);
@@ -247,6 +251,7 @@ int printk(unsigned int pass_loglevel, const char* str, ...) {
 	va_list params;
 	va_start(params, str);
 	char buf[1024] = {0};
+	retrieve_uptime();
 	set_ftimestamp(uptime, buf);
 	int i = strlen(buf);
 	int j = 0;
@@ -264,6 +269,7 @@ int printk(unsigned int pass_loglevel, const char* str, ...) {
 int cprintk(unsigned int pass_loglevel, const char *str, va_list params) {
 	if (pass_loglevel > loglevel) return -1;
 	char buf[1024] = {0};
+	retrieve_uptime();
 	set_ftimestamp(uptime, buf);
 	int i = strlen(buf);
 	int j = 0;

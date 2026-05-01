@@ -20,6 +20,9 @@ int poweroff() {
 	printk(6, "Disabled PIC");
 	pit_shutdown();
 	printk(6, "Disabled PIT");
+	while (inb(0x64) & 0x02);
+	outb(0x64, 0xAD);
+	printk(6, "Disabled PS/2 keyboard");
 	printk(4, "power: Powering off");
 	outw(0x604, 0x2000); // new QEMU
 	outw(0xB004, 0x2000); // bochs and old QEMU

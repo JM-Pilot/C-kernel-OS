@@ -39,7 +39,7 @@ _start:
 	push %ebx
 	push %eax
 	call kmain
-	push $stat_kmain_return
+	push stat_kmain_return
 	call panic
 
 .section .rodata

@@ -1,5 +1,6 @@
 #include <stddef.h>
 int strcmp(const char *a, const char *b);
+int strncmp(const char *a, const char *b, unsigned int count);
 size_t strlen(const char *a);
 char *strcat(char *to, const char *from);
 char *strcpy(char *to, const char *from);

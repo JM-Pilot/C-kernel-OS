@@ -14,8 +14,8 @@ const char *credits =
 "           you: for usage of this experimental OS";
 char serial_in = false; // true and false is defined in stdlib.h. while this is not the C standard, it makes you have to import less headers.
 char serial_out = false;
-volatile char kbc = 0;
+volatile char kbc;
 // i'm sorry fellow C developers for this shitty solution but i just have to do this
-uint64_t uptime_ticks = 0;
+volatile uint64_t uptime_ticks = 0;
 
 unsigned char loglevel = 7; // You don't want to recompile the kernel just because you don't have all the info to debug an error

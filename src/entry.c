@@ -46,6 +46,9 @@ void parse_cmdline(char *input) {
 		} else if (strcmp(a, "s_out") == 0) {
 			serial_out = true;
 			printk(6, "Serial output enabled");
+		} else if (strcmp(a, "s_in") == 0) {
+			serial_in = true;
+			printk(6, "Serial input enabled");
 		} else {
 			printk(2, "Invalid command line argument %s, ignoring", a);
 		}
@@ -103,7 +106,7 @@ void kmain(int magic, mbinfo_t *mbi) {
 	__asm__ volatile ("sti");
 	printk(6, "Set interrupts");
 	init_pit();
-	printk(6, "Initialized PIT at 1.43 KHz");
+	printk(6, "Initialized PIT at 10 KHz");
 	printk(7, "isr6(): %x", isr6);
 	printk(7, "isr0(): %x", isr0);
 	printk(7, "CPU: %s", get_cpu_vendor());
@@ -127,11 +130,12 @@ void kmain(int magic, mbinfo_t *mbi) {
 		//char c = loop_until_keypress();
 		char c = kbc; // from globals
 		__asm__ volatile ("pause");
-		if (c) { putc(c); kbc = 0; } else { __asm__ volatile ("hlt"); continue; }
+		if (c) { if (c != '\b') { putc(c); } kbc = 0; } else { __asm__ volatile ("hlt"); continue; }
 		if (c == '\b') {
 			if (index > 0) {
 				index--;
 				command[index] = '\0';
+				putc('\b');
 			}
 			//lastchar--;
 			continue;
@@ -151,7 +155,7 @@ void kmain(int magic, mbinfo_t *mbi) {
 			//lastchar++;
 		}
 		if (c == '\n') {
-			if (strcmp(command, "help") == 0) {
+			if (strncmp(command, "help", 4) == 0) {
 				printf("The commands are:\n"
 				"hello: say hello to the world\n"
 				"poweroff: turn the system off (QEMU only)\n"
@@ -163,48 +167,58 @@ void kmain(int magic, mbinfo_t *mbi) {
 				"clear: clear the screen\n"
 				"panictest: test the panic functionality\n"
 				"crash: triggers a crash\n"
-				"cpuinfo: get CPU info\n");
-			} else if (strcmp(command, "hello") == 0) {
+				"cpuinfo: get CPU info\n"
+				"delaytest: test delay functions\n");
+			} else if (strncmp(command, "hello", 5) == 0) {
 				printf("Hello, World!\n");
-			} else if (strcmp(command, "poweroff") == 0) {
+			} else if (strncmp(command, "poweroff", 8) == 0) {
 				poweroff();
 				panic("Failed to power off; likely not a QEMU machine");
-			} else if (strcmp(command, "reboot") == 0) {
+			} else if (strncmp(command, "reboot", 6) == 0) {
 				reboot();
 				__asm__ volatile ("hlt");
 				panic("Failed to reboot; unknown error");
-			} else if (strcmp(command, "halt") == 0) {
+			} else if (strncmp(command, "halt", 4) == 0) {
 				printf("System halted. It is now safe to power off.\n");
 				while (1) halt();
-			} else if (strcmp(command, "waitint") == 0) {
+			} else if (strncmp(command, "waitint", 7) == 0) {
 				__asm__ volatile ("hlt");
-			} else if (strcmp(command, "logo") == 0) {
+			} else if (strncmp(command, "logo", 4) == 0) {
 				set_color(0x0F);
 				printf("%s\n", logo);
 				set_color(0x07);
-			} else if (strcmp(command, "ver") == 0) {
+			} else if (strncmp(command, "ver", 3) == 0) {
 				printf("%s\n", ver);
-			} else if (strcmp(command, "panictest") == 0) {
+			} else if (strncmp(command, "panictest", 9) == 0) {
 				panic("User-triggered panic");
-			} else if (strcmp(command, "clear") == 0) {
+			} else if (strncmp(command, "clear", 5) == 0) {
 				clear_screen();
-			} else if (strcmp(command, "exit") == 0) {
-				return;
-			} else if (strcmp(command, "credits") == 0) {
+			} else if (strncmp(command, "exit", 4) == 0) {
+				for (;;) halt();
+			} else if (strncmp(command, "credits", 7) == 0) {
 				printf(credits);
-			} else if (strcmp(command, "crash") == 0) {
+			} else if (strncmp(command, "crash", 5) == 0) {
 				//__asm__ volatile ("int $0");
 				__asm__ volatile ("int3");
-			} else if (strcmp(command, "cpuinfo") == 0) {
+			} else if (strncmp(command, "cpuinfo", 7) == 0) {
 				printf("CPU vendor: '%s', friendly name '%s'\n", get_cpu_vendor(), get_cpu_vendor_user());
 				printf("CPU brand: '%s'\n", brand);
 				struct cpufreq_s _temp = get_cpu_clk();
 				*cpufreq = _temp;
 				printf("CPU clock speeds (CPUID EAX=16h):\nBase: %d MHz, max: %d MHz, Bus: %d MHz\n", cpufreq->base, cpufreq->max, cpufreq->bus);
-				unsigned int clk_d = get_cpu_clk_d();
-				printf("TSC-based clock speed: %d\n", clk_d);
-			} else if (strcmp(command, "oopstest") == 0) {
+				// FIXME
+				//unsigned int clk_d = get_cpu_clk_d();
+				//printf("TSC-based clock speed: %d\n", clk_d);
+			} else if (strncmp(command, "oopstest", 8) == 0) {
 				oops("User-triggered oops");
+			} else if (strncmp(command, "delaytest", 9) == 0) {
+				printk(0, "test #1: wait 500 ms");
+				delay(500);
+				printk(0, "done, test #2: wait 1 second");
+				delay(1000);
+				printk(0, "done, test #3: wait 5 seconds");
+				delay(5000);
+				printk(0, "done, all tests passed!");
 			} else if (index > 0) { // lastchar
 				printf("Invalid command: %s\n", command);
 			}

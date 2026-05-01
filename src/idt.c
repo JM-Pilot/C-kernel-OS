@@ -6,6 +6,7 @@
 #include <globals.h>
 #include <pit.h>
 #include <string.h>
+#include <serial.h>
 
 idt_entry_t idt_ents[256];
 idtp_t idt_ptr;
@@ -100,7 +101,13 @@ void irq_handler(regs_t *r) {
 	}
 	if (r->int_n == 33) {
 		char c = scancode_to_c(kb_get_scancode());
-		if (c) kbc = c;
+		if (kbc) printk(2, "irq: Warning: KeyBoard Character clogged, input not handled");
+		if (c && !kbc) kbc = c;
+	}
+	if (r->int_n == 36 && serial_in) {
+		char c = sgetc();
+		if (kbc) printk(2, "irq: Warning: KeyBoard Character clogged, input not handled");
+		if (c && !kbc) kbc = c;
 	}
 	if (r->int_n >= 40) outb(0xA0, 0x20);
 	outb(0x20, 0x20);

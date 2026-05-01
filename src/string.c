@@ -11,6 +11,16 @@ int strcmp(const char *a, const char *b) {
 	return (*(unsigned char *)a) - (*(unsigned char *)b);
 }
 
+int strncmp(const char *a, const char *b, unsigned int count) {
+	if (!a || !b) {
+		if (a == b) return 0;
+		return a ? 1 : -1;
+	}
+	size_t bytes = 0;
+	while (*a != '\0' && *a == *b && bytes < 16777216/32 && bytes+1 < count) { a++; b++; bytes++; }
+	return (*(unsigned char *)a) - (*(unsigned char *)b);
+}
+
 size_t strlen(const char *a) {
 	size_t bytes = 0;
 	while (a[bytes] != '\0' && bytes < 16777216/32) { bytes++; }

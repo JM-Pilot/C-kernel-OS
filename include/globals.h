@@ -9,7 +9,7 @@ extern const char *credits;
 extern char serial_in;
 extern char serial_out;
 extern volatile char kbc;
-extern uint64_t uptime_ticks;
+extern volatile uint64_t uptime_ticks;
 extern unsigned char loglevel;
 
 // Print levels
