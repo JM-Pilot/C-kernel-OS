@@ -98,17 +98,18 @@ void irq_handler(regs_t *r) {
 	//printk("IRQ %x", r->int_n);
 	if (r->int_n == 32) {
 		pit_tick(r);
-	}
-	if (r->int_n == 33) {
+	} else if (r->int_n == 33) {
 		char c = scancode_to_c(kb_get_scancode());
 		if (kbc) printk(2, "irq: Warning: KeyBoard Character clogged, input not handled");
 		if (c && !kbc) kbc = c;
-	}
-	if (r->int_n == 36 && serial_in) {
-		char c = sgetc();
+	} else if (r->int_n == 36 && serial_in) {
+		char c = sgetc(0);
 		if (kbc) printk(2, "irq: Warning: KeyBoard Character clogged, input not handled");
 		if (c && !kbc) kbc = c;
-	}
-	if (r->int_n >= 40) outb(0xA0, 0x20);
+	} else if (r->int_n == 35 && serial_in) {
+		char c = sgetc(1);
+		if (kbc) printk(2, "irq: Warning: KeyBoard Character clogged, input not handled");
+		if (c && !kbc) kbc = c;	
+	} else if (r->int_n >= 40) outb(0xA0, 0x20);
 	outb(0x20, 0x20);
 }

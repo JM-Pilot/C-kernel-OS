@@ -77,12 +77,12 @@ void kmain(int magic, mbinfo_t *mbi) {
 	//puts(string_thing);
 	debug_info_print();
 	serial_init();
-	printk(6, "Initialized serial at 0x3F8 (COM1)");
+	printk(6, "Initialized serial at %x (COM1) and %x (COM2)", UART1, UART2);
 	printk(6, "Multiboot flags: %x", mbi->flags);
 	char *cmdline = NULL;
 	//char *strings[16];
 	// FIXME: magic is 0
-	//if (magic != 0x1BADB002) panic("Incorrect Multiboot 1 magic number! Got 0x%x, should be 0x1BADB002");
+	//if (magic != 0x1BADB002) panic("Incorrect Multiboot 1 magic number! Got 0x%x, should be 0x1BADB002", magic);
 	if (mbi->flags & (1 << 2)) {
 		cmdline = (char*)mbi -> cmdline;
 		printk(5, "Command line: %s", cmdline);
