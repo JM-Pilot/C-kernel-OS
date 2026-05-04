@@ -1,8 +1,13 @@
 .section .multiboot
 .align 4
 .long 0x1BADB002
-.long 0x00000000
-.long -(0x1BADB002)
+.long (1 << 2)
+.long -(0x1BADB002 + (1 << 2)) & 0xFFFFFFFF
+.skip 24
+.long 0
+.long 1024
+.long 768
+.long 32
 
 .section .bss
 .globl cpu_vendor

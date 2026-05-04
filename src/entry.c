@@ -15,6 +15,9 @@
 #include <generated/__GENVER.h> // Build info
 #include <cpu.h> // CPU vendor string
 #include <generated/__BLD.h> // Build number
+#include <stddef.h> // Stuff like uint8_t
+
+fb_info_t *fb_info;
 
 char *__split_cmdline(char **buffer) {
 	char *a, *b;
@@ -45,6 +48,18 @@ void parse_cmdline(char *input) {
 			loglevel = 2;
 		} else if (strcmp(a, "s_out") == 0) {
 			serial_out = true;
+			sputs("\e[0m\e[H\e[J\e[1J\e[2J\r\e[=7h\e[?25h");
+			/*
+			 * In order:
+			 * '\e[0m'            disable all modes
+			 * '\e[H'             move cursor to (0, 0)
+			 * '\e[J'             erase what's displayed
+			 * '\e[1J'            erase from cursor to beginning of screen
+			 * '\e[2J'            erase entire screen
+			 * '\e[=7h'           enable line wrap
+			 * '\e[?25h'          make cursor visible
+			 * Thanks to @fnky on GitHub for their Gist on this!
+			 */
 			printk(6, "Serial output enabled");
 		} else if (strcmp(a, "s_in") == 0) {
 			serial_in = true;
@@ -79,6 +94,11 @@ void kmain(int magic, mbinfo_t *mbi) {
 	serial_init();
 	printk(6, "Initialized serial at %x (COM1) and %x (COM2)", UART1, UART2);
 	printk(6, "Multiboot flags: %x", mbi->flags);
+	fb_info->flags = mbi->flags;
+	fb_info->w = mbi->fb_width;
+	fb_info->h = mbi->fb_height;
+	fb_info->bpp = mbi->fb_bpp;
+	fb_info->fb = (uint8_t *)(uintptr_t)mbi->fb_addr;
 	char *cmdline = NULL;
 	//char *strings[16];
 	// FIXME: magic is 0
@@ -219,6 +239,9 @@ void kmain(int magic, mbinfo_t *mbi) {
 				printk(0, "done, test #3: wait 5 seconds");
 				delay(5000);
 				printk(0, "done, all tests passed!");
+			} else if (strncmp(command, "get_fb", 6) == 0) {
+				printk(6, "mbi before fb_init: %x", mbi);
+				fb_init(fb_info);
 			} else if (index > 0) { // lastchar
 				printf("Invalid command: %s\n", command);
 			}

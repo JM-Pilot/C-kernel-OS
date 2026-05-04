@@ -41,7 +41,7 @@ void serial_shutdown() {
 	serial_in = false;
 	outb(COM1+1, 0x00);
 	outb(COM2+1, 0x00);
-	printk(6, "serial: Serial shut down");
+	printk(5, "serial: Serial shut down");
 }
 
 int transmit_fifo_empty_com1() {
