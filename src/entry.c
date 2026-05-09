@@ -17,7 +17,11 @@
 #include <generated/__BLD.h> // Build number
 #include <stddef.h> // Stuff like uint8_t
 
-fb_info_t *fb_info;
+static fb_info_t fb_info_real;
+static color_info_t color_info_real;
+
+fb_info_t *fb_info = &fb_info_real;
+color_info_t *color_info = &color_info_real;
 
 char *__split_cmdline(char **buffer) {
 	char *a, *b;
@@ -98,7 +102,16 @@ void kmain(int magic, mbinfo_t *mbi) {
 	fb_info->w = mbi->fb_width;
 	fb_info->h = mbi->fb_height;
 	fb_info->bpp = mbi->fb_bpp;
-	fb_info->fb = (uint8_t *)(uintptr_t)mbi->fb_addr;
+	fb_info->fb = (uint32_t*)(uintptr_t)mbi->fb_addr;
+	fb_info->type = mbi->fb_type;
+	fb_info->pitch = mbi->fb_pitch;
+	color_info->red_pos = mbi->fb_rpos;
+	color_info->red_size = mbi->fb_rsize;
+	color_info->green_pos = mbi->fb_gpos;
+	color_info->green_size = mbi->fb_gsize;
+	color_info->blue_pos = mbi->fb_bpos;
+	color_info->blue_size = mbi->fb_bsize;
+	fb_info->color_info = color_info;
 	char *cmdline = NULL;
 	//char *strings[16];
 	// FIXME: magic is 0
@@ -135,6 +148,8 @@ void kmain(int magic, mbinfo_t *mbi) {
 	// technically i don't think you have to call it more than once but never too safe :P
 	char brand[13];
 	printk(7, "---> %s", get_cpu_brand(brand));
+	fb_init(fb_info);
+	printk(6, "Initialized framebuffer");
 	printk(7, "Hello, World!");
 	set_color(0x0F);
 	printf("%s\n", logo); // globals.h:4
@@ -188,7 +203,8 @@ void kmain(int magic, mbinfo_t *mbi) {
 				"panictest: test the panic functionality\n"
 				"crash: triggers a crash\n"
 				"cpuinfo: get CPU info\n"
-				"delaytest: test delay functions\n");
+				"delaytest: test delay functions\n"
+				"fb_demo: framebuffer demo\n");
 			} else if (strncmp(command, "hello", 5) == 0) {
 				printf("Hello, World!\n");
 			} else if (strncmp(command, "poweroff", 8) == 0) {
@@ -212,7 +228,7 @@ void kmain(int magic, mbinfo_t *mbi) {
 			} else if (strncmp(command, "panictest", 9) == 0) {
 				panic("User-triggered panic");
 			} else if (strncmp(command, "clear", 5) == 0) {
-				clear_screen();
+				clear_screen(fb_info);
 			} else if (strncmp(command, "exit", 4) == 0) {
 				for (;;) halt();
 			} else if (strncmp(command, "credits", 7) == 0) {
@@ -239,9 +255,10 @@ void kmain(int magic, mbinfo_t *mbi) {
 				printk(0, "done, test #3: wait 5 seconds");
 				delay(5000);
 				printk(0, "done, all tests passed!");
-			} else if (strncmp(command, "get_fb", 6) == 0) {
-				printk(6, "mbi before fb_init: %x", mbi);
-				fb_init(fb_info);
+			/*} else if (strncmp(command, "get_fb", 6) == 0) {
+				fb_init(fb_info);*/
+			} else if (strncmp(command, "fb_demo", 7) == 0) {
+				fb_demo_2(fb_info);
 			} else if (index > 0) { // lastchar
 				printf("Invalid command: %s\n", command);
 			}

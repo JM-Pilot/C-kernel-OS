@@ -46,7 +46,7 @@ void set_color(unsigned char vga_color) {
 	color = vga_color;
 }
 
-void clear_screen() {
+void clear_screen_vga() {
 	for (int i = 0; i < 2000; i++) {
 		buffer[i] = (color << 8) + 0x20;
 	}

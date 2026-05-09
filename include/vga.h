@@ -4,7 +4,7 @@
 #include <stdarg.h>
 void set_cursor_pos(int row, int col);
 void set_color(unsigned char vga_color);
-void clear_screen();
+void clear_screen_vga();
 void set_ftimestamp(double timestamp, char *buf);
 int putc(int c);
 int puts(const char *s);

@@ -29,6 +29,21 @@ typedef struct multiboot_info {
 	uint32_t fb_height;
 	uint8_t fb_bpp;
 	uint8_t fb_type;
+	union {
+		struct {
+			uint32_t fb_palette_addr;
+			uint16_t fb_palette_color_n;
+		};
+		struct {
+			uint8_t fb_rpos;
+			uint8_t fb_rsize;
+			uint8_t fb_gpos;
+			uint8_t fb_gsize;
+			uint8_t fb_bpos;
+			uint8_t fb_bsize;
+			// TODO finish those according to color_info_t
+		};
+	};
 } __attribute__((packed)) mbinfo_t;
 
 typedef struct {
@@ -39,13 +54,28 @@ typedef struct {
 } __attribute__((packed)) mb_memmap_t;
 
 typedef struct {
+	uint8_t red_pos;
+	uint8_t red_size;
+	uint8_t green_pos;
+	uint8_t green_size;
+	uint8_t blue_pos;
+	uint8_t blue_size;
+} color_info_t;
+
+typedef struct {
 	uint32_t flags;
 	uint32_t w;
 	uint32_t h;
 	uint32_t bpp;
-	uint8_t *fb;
+	uint32_t *fb;
+	uint8_t type;
+	uint32_t pitch;
+	color_info_t *color_info;
 } fb_info_t;
 
 extern uint8_t *framebuffer;
 void fb_init(fb_info_t *fb_info);
+void fb_demo_2(fb_info_t *fbi);
+void set_pixel(int x, int y, unsigned int color);
+void clear_screen(fb_info_t *fb_info);
 #endif
