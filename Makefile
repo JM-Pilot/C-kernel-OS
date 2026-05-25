@@ -1,9 +1,14 @@
 CCFLAGS = -target i386-elf -fno-pie -fno-pic -Wunused -Wall -Wextra
-CCFLAGSC = -ffreestanding -target i386-elf -fno-exceptions -fno-stack-protector -fno-align-functions -fno-pie -fno-pic -fno-unwind-tables -fno-asynchronous-unwind-tables -I include -nostdlib -Wall -Wextra -fno-ident -Wunused
+CCFLAGSC = -ffreestanding -target i386-elf -fno-exceptions -fno-stack-protector -fno-align-functions -fno-pie -fno-pic -fno-unwind-tables -fno-asynchronous-unwind-tables -I include -nostdlib -Wall -Wextra -fno-ident -Wunused -O3 -msse2
 SRC_C := $(wildcard src/*.c)
 SRC_S := $(wildcard src/*.s)
 SRC_ASM := $(wildcard src/*.asm)
-OBJECTS := $(patsubst src/%.c,build/%.o,$(wildcard src/*.c)) $(patsubst src/%.s,build/%.o,$(wildcard src/*.s)) $(patsubst src/%.asm,build/%.o,$(SRC_ASM))
+OBJECTS := $(patsubst src/%.c,build/%.o,$(wildcard src/*.c)) $(patsubst src/%.s,build/%.o,$(wildcard src/*.s)) $(patsubst src/%.asm,build/%.o,$(SRC_ASM)) build/font_file.o
+
+MAJOR = 0
+MINOR = 04
+PATCH = 0
+ADDITIONAL = -beta
 
 .NOTPARALLEL:
 .PHONY: build
@@ -26,7 +31,11 @@ build:
 	@echo "Running scripts/gen_ver_ex.sh"
 	@scripts/gen_ver_ex.sh
 
-build/%.o: src/%.c | build
+include/generated/config.h: .config | build
+	@echo "Config has been changed. Regenerating"
+	@scripts/gen_conf.sh $(MAJOR) $(MINOR) $(PATCH) "$(ADDITIONAL)"
+
+build/%.o: src/%.c include/generated/config.h | build
 	@echo "Compiling $<"
 	@clang -c $< -o $@ $(CCFLAGSC)
 
@@ -37,6 +46,10 @@ build/%.o: src/%.s | build
 build/%.o: src/%.asm | build
 	@echo "Assembling $<"
 	@nasm -f elf32 $< -o $@
+
+build/font_file.o: fonts/default_8x16.psf | build
+	@echo "Creating font object"
+	@ld.lld -r -b binary $< -o $@ -m elf_i386
 
 build/bootImage.elf: $(OBJECTS)
 	@echo "Linking the kernel"
@@ -68,7 +81,16 @@ cl:
 	@echo -n "lines of true code: "
 	@grep -R "" src/*.c src/*.s src/*.asm include/*.h | wc -l
 	@echo -n "lines of code in total: "
-	@grep -R "" src/*.c src/*.s src/*.asm include/*.h Makefile iso/boot/grub/grub.cfg scripts/*.sh | wc -l
+	@grep -R "" src/*.c src/*.s src/*.asm include/*.h Makefile iso/boot/grub/grub.cfg scripts/*.sh Kconfig | wc -l
+
+menuconfig:
+	@kconfig-mconf Kconfig
+
+allyesconfig:
+	@kconfig-conf --allyesconfig Kconfig
+
+allnoconfig:
+	@kconfig-conf --allnoconfig Kconfig
 
 mrproper:
 	@echo "Erasing all data!"

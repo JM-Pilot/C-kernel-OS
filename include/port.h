@@ -5,5 +5,6 @@
 uint8_t inb(uint16_t port);
 void outb(uint16_t port, uint8_t data);
 void wait_port();
+void set_post(uint8_t value);
 
 #endif

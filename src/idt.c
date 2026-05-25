@@ -7,6 +7,7 @@
 #include <pit.h>
 #include <string.h>
 #include <serial.h>
+#include <generated/config.h>
 
 idt_entry_t idt_ents[256];
 idtp_t idt_ptr;
@@ -98,18 +99,22 @@ void irq_handler(regs_t *r) {
 	//printk("IRQ %x", r->int_n);
 	if (r->int_n == 32) {
 		pit_tick(r);
+#if CONFIG_PS2_KB
 	} else if (r->int_n == 33) {
 		char c = scancode_to_c(kb_get_scancode());
-		if (kbc) printk(2, "irq: Warning: KeyBoard Character clogged, input not handled");
+		//if (kbc) printk(2, "irq: Warning: KeyBoard Character clogged, input not handled");
 		if (c && !kbc) kbc = c;
+#endif
+#if CONFIG_SERIAL
 	} else if (r->int_n == 36 && serial_in) {
 		char c = sgetc(0);
-		if (kbc) printk(2, "irq: Warning: KeyBoard Character clogged, input not handled");
+		//if (kbc) printk(2, "irq: Warning: KeyBoard Character clogged, input not handled");
 		if (c && !kbc) kbc = c;
 	} else if (r->int_n == 35 && serial_in) {
 		char c = sgetc(1);
-		if (kbc) printk(2, "irq: Warning: KeyBoard Character clogged, input not handled");
-		if (c && !kbc) kbc = c;	
+		//if (kbc) printk(2, "irq: Warning: KeyBoard Character clogged, input not handled");
+		if (c && !kbc) kbc = c;
+#endif
 	} else if (r->int_n >= 40) outb(0xA0, 0x20);
 	outb(0x20, 0x20);
 }

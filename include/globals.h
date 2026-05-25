@@ -8,9 +8,16 @@ extern const char *logo;
 extern const char *credits;
 extern char serial_in;
 extern char serial_out;
+extern char serial_com1;
+extern char serial_com2;
 extern volatile char kbc;
 extern volatile uint64_t uptime_ticks;
 extern unsigned char loglevel;
+extern char font_initialized;
+extern int fb_x;
+extern int fb_y;
+extern uint32_t fg_color;
+extern uint32_t bg_color;
 
 // Print levels
 #define PR_EMERG 0

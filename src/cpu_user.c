@@ -2,6 +2,7 @@
 #include <string.h>
 #include <cpuid.h> // first ever header outside CkOS to be included!
 #include <vga.h>
+#include <stdint.h>
 
 char *get_cpu_vendor_user() {
 	char *vendor = get_cpu_vendor();
@@ -70,12 +71,11 @@ struct cpufreq_s get_cpu_clk() {
 }
 
 unsigned int get_cpu_clk_d() {
-	unsigned int r[8];
+	unsigned int r[4];
 	__cpuid(0x15, r[0], r[1], r[2], r[3]);
-	__cpuid(0x80000007, r[4], r[5], r[6], r[7]);
-	if (!(r[7] & (1u << 8))) return 0;
-	if (!r[0]) return 1;
-	printk(6, "cpu_user: %d %d %d %d | %d %d %d %d", r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7]);
+	if (!r[0] || !r[1]) return 0;
+	printk(6, "cpu_user: %d %d %d %d", r[0], r[1], r[2], r[3]);
+	unsigned long long hertz = ((uint64_t)r[2]*(uint64_t)r[1])/(uint64_t)r[0];
 	// does this even fucking work?
-	return (r[2]*r[1])/(r[0]*1000000);
+	return (unsigned int)(hertz/1000000);
 }

@@ -4,6 +4,11 @@
 #include <stdlib.h>
 #include <globals.h>
 
+#define MAX_LEN_NOP "\
+		data16 data16 data16 data16 \
+		data16 data16 data16 data16 \
+		data16 nopw %cs:0x0(%eax,%eax,1)"
+
 void init_pit() {
 	pit_set_div(10000);
 }
@@ -12,6 +17,7 @@ void pit_shutdown() {
 	outb(0x43, 0x30);
 	outb(0x40, 0x00);
 	outb(0x40, 0x00);
+	outb(0x21, inb(0x21) | 1);
 }
 
 void pit_set_div(uint16_t hz) {
@@ -37,5 +43,5 @@ void retrieve_uptime() {
 void delay(unsigned int ms) {
 	unsigned int begin = uptime_ticks;
 	unsigned int ticks = ms*10;
-	while ((uptime_ticks-begin) < ticks) __asm__ volatile ("hlt");
+	while ((uptime_ticks-begin) < ticks) __asm__ volatile ("pause"); //(MAX_LEN_NOP);
 }

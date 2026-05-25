@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <string.h>
+#include <stdint.h>
 
 int strcmp(const char *a, const char *b) {
 	if (!a || !b) {
@@ -59,10 +60,42 @@ void *memset(void *to, int what, unsigned int count) {
 void *memmove(void *to, const void *from, size_t size) {
 	unsigned char *dest = (unsigned char*)to;
 	const unsigned char *src = (const unsigned char *)from;
-	if (dest < src) {
+	if (dest == src || !size) return to;
+	/*if (dest < src) {
 		for (size_t i = 0; i < size; i++) dest[i] = src[i];
 	} else {
 		for (size_t i = size; i; i--) dest[i-1] = src[i-1];
+	}*/
+	if (dest < src) {
+		if ((((uintptr_t)dest ^ (uintptr_t)src) & (sizeof(size_t)-1)) == 0) {
+			while (size && ((uintptr_t)dest & (sizeof(size_t)-1))) {
+				*dest++ = *src++; size--;
+			}
+			size_t *_dest = (size_t*)dest;
+			const size_t *_src = (const size_t*)src;
+			while (size >= sizeof(size_t)) {
+				*_dest++ = *_src++; size -= sizeof(size_t);
+			}
+			dest = (unsigned char*)_dest;
+			src = (const unsigned char*)_src;
+		}
+		while (size--) *dest++ = *src++;
+	} else {
+		dest += size; src += size;
+		if ((((uintptr_t)dest ^ (uintptr_t)src) & (sizeof(size_t)-1)) == 0) {
+			while (size && ((uintptr_t)dest & (sizeof(size_t)-1))) {
+				*--dest = *--src; size--;
+			}
+			size_t *_dest = (size_t*)dest;
+			const size_t *_src = (const size_t*)src;
+			while (size >= sizeof(size_t)) {
+				*--_dest = *--_src;
+				size -= sizeof(size_t);
+			}
+			dest = (unsigned char*)_dest;
+			src = (const unsigned char*)_src;
+		}
+		while (size--) *--dest = *--src;
 	}
 	return to;
 }

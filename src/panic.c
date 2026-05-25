@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <idt.h> // regs_t
 #include <globals.h> // loglevel
+#include <font.h> // term flush
 
 // `__panic_` variables. they are defined here to avoid putting them in the stack
 
@@ -43,7 +44,7 @@ void oops(const char *msg, ...) {
 	oopsing = 1;
 	va_list params;
 	va_start(params, msg);
-	set_color(0x1F);
+	set_color(0x000000AA, 0x00FFFFFF);
 	msg2 = msg;
         // first header
         while (*__oops_pre && __oops_i < 1023) __oops_buf[__oops_i++] = *__oops_pre++;
@@ -70,9 +71,10 @@ void oops(const char *msg, ...) {
 		panic("Oopsed three times");
 		__asm__ volatile ("hlt");
 	}
-	set_color(0x07); oopsing = 0;
+	set_color(0x00000000, 0x00AAAAAA); oopsing = 0;
 	__asm__ volatile ("sti");
 	loglevel = log_old;
+	flush_term();
 }
 
 // panic rewrites: 5
@@ -101,7 +103,7 @@ void panic(const char *msg, ...) {
 	panicking = 1;
 	va_list params;
 	va_start(params, msg);
-	set_color(0x1F);
+	set_color(0x000000AA, 0x00FFFFFF);
 	msg3 = msg;
 	// first header
 	while (*__panic_pre && __panic_i < 1023) __panic_buf[__panic_i++] = *__panic_pre++;
@@ -125,6 +127,7 @@ void panic(const char *msg, ...) {
 	while (*__panic__post && __panic_j < 1023) __panic_buf2[__panic_j++] = *__panic__post++;
 	__panic_buf2[__panic_j] = '\0'; // NULL terminate
 	cprintk(0, __panic_buf2, params);
+	flush_term();
 	va_end(params);
 	__asm__ volatile ("hlt");
 }

@@ -32,6 +32,18 @@ int poweroff() {
 }
 
 int reboot() {
+	printk(4, "power: The system will shut down!");
+	__asm__ volatile ("cli");
+	printk(6, "power: Disabled interrupts");
+	serial_shutdown();
+	printk(6, "Disabled serial");
+	pic_shutdown();
+	printk(6, "Disabled PIC");
+	pit_shutdown();
+	printk(6, "Disabled PIT");
+	while (inb(0x64) & 0x02);
+	outb(0x64, 0xAD);
+	printk(6, "Disabled PS/2 keyboard");
 	printk(4, "power: Rebooting");
 	outb(0x64, 0xFE);
 	return 1;

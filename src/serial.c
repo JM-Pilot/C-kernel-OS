@@ -5,12 +5,15 @@
 #include <globals.h>
 #include <stdlib.h>
 #include <vga.h>
-unsigned short COM1 = 0x03F8;
-unsigned short COM2 = 0x02F8;
+#include <generated/config.h>
+static unsigned short COM1 = 0x03F8;
+static unsigned short COM2 = 0x02F8;
 unsigned short UART1 = 0;
 unsigned short UART2 = 0;
 
-void __init_com_(unsigned short port) {
+#ifdef CONFIG_SERIAL
+#if CONFIG_SERIAL == 1
+static void __init_com_(unsigned short port) {
 	outb(port+1, 0x00);
 	outb(port+3, 0x80);
 	outb(port+0, 0x01);
@@ -20,20 +23,34 @@ void __init_com_(unsigned short port) {
 	outb(port+2, 0xC7); // 0xC7
 	outb(port+4, 0x0B);
 }
+#endif
+#endif
 
 void serial_init() {
-	if (*(unsigned short *)0x400) {
-		COM1 = *(unsigned short *)0x400;
-	}
-	if (*(unsigned short *)0x402) {
-		COM2 = *(unsigned short *)0x402;
-	}
-	UART1 = COM1;
-	UART2 = COM2;
-	__init_com_(COM1);
-	printk(5, "serial: Initialized COM1");
-	__init_com_(COM2);
-	printk(5, "serial: Initialized COM2");
+#ifdef CONFIG_SERIAL
+#if CONFIG_SERIAL
+		if (*(unsigned short *)0x400) {
+			COM1 = *(unsigned short *)0x400;
+		}
+		if (*(unsigned short *)0x402) {
+			COM2 = *(unsigned short *)0x402;
+		}
+		UART1 = COM1;
+		UART2 = COM2;
+		if (CONFIG_COM1) {
+			__init_com_(COM1);
+			printk(5, "serial: Initialized COM1");
+			serial_com1 = 1;
+		}
+		if (CONFIG_COM2) {
+			__init_com_(COM2);
+			printk(5, "serial: Initialized COM2");
+			serial_com2 = 1;
+		}
+#else
+		printk(4, "serial: not configured because support is disabled");
+#endif
+#endif /* CONFIG_SERIAL */
 }
 
 void serial_shutdown() {
@@ -53,10 +70,14 @@ int transmit_fifo_empty_com2() {
 }
 
 void sputc(char c) {
-	while (!transmit_fifo_empty_com1());
-	outb(COM1, c);
-	while (!transmit_fifo_empty_com2());
-	outb(COM2, c);
+	if (serial_com1) {
+		while (!transmit_fifo_empty_com1());
+		outb(COM1, c);
+	}
+	if (serial_com2) {
+		while (!transmit_fifo_empty_com2());
+		outb(COM2, c);
+	}
 }
 
 // same story as puts, but for serial
@@ -77,7 +98,16 @@ void sputs(const char *s) {
 }*/
 
 int sgetc_raw(unsigned char port) {
-	unsigned short com = port == 1 ? 0x2F8 : 0x3F8;
+	unsigned short com = 0;
+	if (serial_com1 && serial_com2) {
+		com = port == 1 ? UART2 : UART1;
+	} else if (serial_com1 && !serial_com2) {
+		com = UART1;
+	} else if (!serial_com1 && serial_com2) {
+		com = UART2;
+	} else {
+		return 0;
+	}
 	uint8_t state = inb(com+5);
 	if (!(state & 1)) return -1;
 	if (state & 0x1E) {

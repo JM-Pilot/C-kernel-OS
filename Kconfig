@@ -1,0 +1,66 @@
+mainmenu "CkOS kernel setup"
+menu "General config"
+config CMDLINE
+	bool "Compiled-in command line"
+	default n
+config CMDLINE_STR
+	string "Command line string"
+	depends on CMDLINE
+	default ""
+comment "Warning: the built-in command line will be always empty. If that's a mistake, disable CONFIG_CMDLINE"
+	depends on CMDLINE_STR = "" && CMDLINE
+endmenu
+menu "Visuals and aesthetic features"
+config ADDITIONAL_VER
+	string "Additional name for the final kernel version"
+	default ""
+comment "Disabling color in framebuffer text mode does not impact color elsewhere"
+	depends on COLOR_FB_TEXT = n
+config COLOR_FB_TEXT
+	bool "Support color in framebuffer text mode"
+	default y
+comment "Text colors from settings below are in XRGB"
+config COLOR_FB_FG
+	hex "Default foreground text color"
+	default 0x00AAAAAA
+config COLOR_FB_BG
+	hex "Default background text color"
+	default 0x00000000
+config ANIMATIONS
+	bool "Enable animations from the `fb_demo` command"
+	default y
+config PRINTK_TIME
+	bool "Show timestamp in printk logs"
+	default y
+config LOGO
+	bool "Show the CkOS text graphic at bootup"
+	default y
+config LOGLEVEL
+	int "Default loglevel (0-7)"
+	default 7
+comment "Warning: it is harder to debug when loglevel is set low"
+	depends on LOGLEVEL < 4
+endmenu
+menu "Devices"
+comment "Warning: no input device is enabled"
+	depends on SERIAL = n && PS2_KB = n
+config SERIAL
+	bool "Serial for late printk logging and alternate input"
+	default y
+comment "Warning: CONFIG_SERIAL is useless if both serial ports are disabled and thus will compile more code"
+	depends on COM1 = n && COM2 = n
+config COM1
+	bool "Enable COM1"
+	depends on SERIAL
+	default y
+comment "COM2 is the terminal's COM port if ran using the `qemu` target"
+	depends on SERIAL
+config COM2
+	bool "Enable COM2"
+	depends on SERIAL
+	default n
+config PS2_KB
+	bool "Enable PS/2 keyboard"
+	default y
+endmenu
+

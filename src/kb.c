@@ -8,7 +8,9 @@
 #include <serial.h>
 #include <stddef.h>
 #include <globals.h>
+#include <generated/config.h>
 
+#if CONFIG_PS2_KB
 static uint8_t shift = 0;
 static uint8_t ctrl = 0;
 static uint8_t alt = 0;
@@ -35,11 +37,18 @@ static const char scancode_map_upper[] = {
 uint8_t shift_pressed() { return shift; }
 uint8_t ctrl_pressed() { return ctrl; }
 uint8_t alt_pressed() { return alt; }
+#else
+uint8_t shift_pressed() { return 0; }
+uint8_t ctrl_pressed() { return 0; }
+uint8_t alt_pressed() { return 0; }
+#endif
 
 void kb_init() {
+#if CONFIG_PS2_KB
 	outb(0x64, 0xAE);
 	shift = 0; ctrl = 0; alt = 0; capslock = 0;
 	kb_flush_buf();
+#endif
 }
 
 void kb_flush_buf() {
@@ -52,6 +61,7 @@ void kb_flush_buf() {
 }
 
 char scancode_to_c(uint8_t sc) {
+#if CONFIG_PS2_KB
 	if (sc == SCANCODE_EXT) {
 		ext = 1;
 		return 0;
@@ -86,9 +96,13 @@ char scancode_to_c(uint8_t sc) {
 	else if (capslock && c >= 'A' && c <= 'Z' && !shift) {}
 	else if (capslock && c >= 'A' && c <= 'Z' && shift ) { c = c - 'A' + 'a'; }
 	return c; // finally holy shit
+#else
+	(void)sc; return 0;
+#endif
 }
 
 uint8_t kb_get_scancode() {
+#if CONFIG_PS2_KB
 	uint8_t status = inb(0x64);
 	for (int i = 0; i < 16; i++) {
 		if (status & 0x01) {
@@ -100,6 +114,9 @@ uint8_t kb_get_scancode() {
 		}
 	}
 	return 0; // no data
+#else
+	return 0;
+#endif
 }
 
 /*unsigned char loop_until_keypress_e() {

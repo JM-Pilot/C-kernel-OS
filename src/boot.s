@@ -1,13 +1,16 @@
 .section .multiboot
 .align 4
 .long 0x1BADB002
-.long (1 << 2)
-.long -(0x1BADB002 + (1 << 2)) & 0xFFFFFFFF
+.long (1 << 2) | (1 << 1)
+.long -(0x1BADB002 + ((1 << 2) | 1 << 1)) & 0xFFFFFFFF
 .skip 24
 .long 0
-.long 1024
-.long 768
+.long 1920
+.long 1080
 .long 32
+#.long 1024
+#.long 768
+#.long 32
 
 .section .bss
 .globl cpu_vendor
@@ -34,6 +37,7 @@ _start:
 	mov $stack_top, %esp
 	cli
 	cld
+	nopw %cs:0x0(%eax,%eax,1)
 	fwait
 	fninit
 	push $stat_boot_fpu_init

@@ -8,33 +8,40 @@
 #include <stdarg.h>
 #include <limits.h>
 #include <pit.h>
+#include <multiboot.h>
+#include <font.h>
+#include <generated/config.h>
 
 /* VGA table of colors
-0 - black
-1 - blue
-2 - green
-3 - bright blue
-4 - red
-5 - pink
-6 - shit
-7 - gray
-8 - dark gray
-9 - light blue
-A - light green
-B - brighter blue
-C - light red
-D - light pink
-E - yellow
-F - white
+0 - black - 0x00000000
+1 - blue - 0x000000AA
+2 - green - 0x0000AA00
+3 - bright blue - 0x0000AAAA
+4 - red - 0x00AA0000
+5 - pink - 0x00AA00AA
+6 - shit - 0x00AA5500
+7 - gray - 0x00AAAAAA
+8 - dark gray - 0x00555555
+9 - light blue - 0x005555FF
+A - light green - 0x0055FF55
+B - brighter blue - 0x0055FFFF
+C - light red - 0x00FF5555
+D - light pink - 0x00FF55FF
+E - yellow - 0x00FFFF55
+F - white - 0x00FFFFFF
 */
 
-unsigned char color = 0x07;
+//unsigned char color = 0x07;
+//extern uint32_t bg_color;
+//extern uint32_t fg_color;
+//uint32_t bg_color = 0x00000000;
+//uint32_t fg_color = 0x00DFDFDF;
 int row = 0;
 int col = 0;
-static uint16_t* buffer = (uint16_t*)0xB8000;
+//static uint16_t* buffer = (uint16_t*)0xB8000;
 int tab_indent = 4;
 
-void set_cursor_pos(int row, int col) {
+/*void set_cursor_pos(int row, int col) {
 	unsigned short pos = row*80+col;
 	outb(0x3D4, 0x0F);
 	outb(0x3D5, (unsigned char)(pos & 0xFF));
@@ -51,9 +58,21 @@ void clear_screen_vga() {
 		buffer[i] = (color << 8) + 0x20;
 	}
 	row = 0; col = 0;
+}*/
+
+void set_color(uint32_t bg, uint32_t fg) {
+#ifdef CONFIG_COLOR_FB_TEXT
+#if CONFIG_COLOR_FB_TEXT
+	bg_color = bg; fg_color = fg;
+#else
+	(void)bg; (void)fg;
+#endif
+#endif /* CONFIG_COLOR_FB_TEXT */
 }
 
 void set_ftimestamp(double timestamp, char* buf) {
+#ifdef CONFIG_PRINTK_TIME
+#if CONFIG_PRINTK_TIME
 	int i = 0;
 	buf[i++] = '[';
 	if (timestamp < 10.0) buf[i++] = ' '; // handle filling the square bracket thingy for our ADHD folks :P
@@ -66,10 +85,15 @@ void set_ftimestamp(double timestamp, char* buf) {
 		buf[i++] = num[j];
 	}
 	buf[i++] = ']';
+	buf[i++] = ' ';
 	buf[i] = '\0';
+#else
+	(void)timestamp; (void)buf;
+#endif
+#endif /* CONFIG_PRINTK_TIME */
 }
 
-void scroll_once() {
+/*void scroll_once() {
 	//int index = 0;
 	for (int i = 0; i < 24; i++) {
 		for (int j = 0; j < 80; j++) {
@@ -80,29 +104,29 @@ void scroll_once() {
 		buffer[24*80+i] = (color << 8) + 0x20;
 	}
 	return;
-}
+}*/
 
 int putc(int c) {
 	if (c == -1) return -1;
 	if (!c) return 0;
 	//set_color(c); // don't uncomment unless you love unicorn puke
 	if (c == '\n') {
-		col = 0; row++;
+		//col = 0; row++;
 		if (serial_out) sputc('\n');
 	} else if (c == '\b') {
-		if (col == 0 && row == 0) {
+		//if (col == 0 && row == 0) {
 			/*col = 79; row--;
 			while (buffer[(row*80+col)-1] == 0x0720 && col != 0) {
 				col--;
 			}*/ // text editor style
-			return 0;
-		} else if (col > 0 && row >= 0 /*2*/) {
-			col--; buffer[row*80+col] = (color << 8) | ' ';
+			//return 0;
+		//} else if (col > 0 && row >= 0 /*2*/) {
+			//col--; buffer[row*80+col] = (color << 8) | ' ';
 			if (serial_out) sputs("\b \b");
-		} else if (col == 0 && row > 0) {
+		/*} else if (col == 0 && row > 0) {
 			col = 79; row--;
 			buffer[row*80+col] = (color << 8) | ' ';
-		}
+		}*/
 	} else if (c == 0x1E) { // up
 		return 0;
 	} else if (c == 0x1F) { // down
@@ -119,35 +143,36 @@ int putc(int c) {
 		}
 		if (serial_out) sputc('\t');
 	} else {
-		buffer[row*80+col] = (color << 8) | c; col++;
+		//buffer[row*80+col] = (color << 8) | c; col++;
 		if (serial_out) sputc(c);
 	}
-	if (col >= 80) {
+	/*if (col >= 80) {
 		col = 0; row++;
 	}
 	if (row >= 25) {
 		scroll_once(); //clear_screen();
 		row = 24; // 0 // 24
 		//col = 0;
-	}
-	set_cursor_pos(row, col);
+	}*/
+	//set_cursor_pos(row, col);
+	if (font_initialized) put_char(c);
 	//if (serial_out) sputc(c);
 	return c;
 }
 
 // put character extended
 
-void putce(char c) {
+/*void putce(char c) {
 	if (c == '\n') {
 		col = 0; row++;
 		sputc(c);
 	} else if (c == '\b') {
-		if (col == 0 && row == 0) {
+		if (col == 0 && row == 0) {*/
 			/*col = 79; row--;
 			while (buffer[(row*80+col)-1] == 0x0720 && col != 0) {
 				col--;
 			}*/ // text editor style
-		} else if (col == 0 && row == 0) {
+		/*} else if (col == 0 && row == 0) {
 			return;
 		} else if (col > 2) {
 			col--; buffer[row*80+col] = (0x07 << 8) | ' ';
@@ -170,7 +195,7 @@ void putce(char c) {
 		//col = 0;
 	}
 	set_cursor_pos(row, col);
-}
+}*/
 
 int puts(const char *s) {
 	while (*s) {
@@ -234,6 +259,7 @@ int cprintf(const char *restrict format, va_list parameters) {
 			written += len; format += len;
 		}
 	}
+	flush_term();
 	return written;
 }
 
@@ -241,6 +267,7 @@ int printf(const char *restrict format, ...) {
 	va_list parameters;
 	va_start(parameters, format);
 	int result = cprintf(format, parameters);
+	flush_term();
 	va_end(parameters);
 	return result;
 }
@@ -255,7 +282,6 @@ int printk(unsigned int pass_loglevel, const char* str, ...) {
 	set_ftimestamp(uptime, buf);
 	int i = strlen(buf);
 	int j = 0;
-	buf[i++] = ' ';
 	while (str[j] && i < 1022) {
 		buf[i++] = str[j++];
 	}
@@ -273,7 +299,6 @@ int cprintk(unsigned int pass_loglevel, const char *str, va_list params) {
 	set_ftimestamp(uptime, buf);
 	int i = strlen(buf);
 	int j = 0;
-	buf[i++] = ' ';
 	while (str[j] && i < 1022) {
 		buf[i++] = str[j++];
 	}

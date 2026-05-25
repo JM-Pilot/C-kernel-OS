@@ -17,3 +17,8 @@ __attribute__((always_inline))
 inline void wait_port() {
 	__asm__ volatile ("outb %%al, $0x80" : : "a"(0));
 }
+
+__attribute__((always_inline))
+inline void set_post(uint8_t value) {
+	outb(0x80, value);
+}

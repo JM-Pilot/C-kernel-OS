@@ -11,7 +11,7 @@ typedef struct multiboot_info {
 	uint32_t mod_addr;
 	uint32_t syms[4];
 	uint32_t memmap_length;
-	uint32_t memmap_addr;
+	uint32_t *memmap_addr;
 	uint32_t drive_length;
 	uint32_t drive_addr;
 	uint32_t cfg_table;
@@ -75,7 +75,11 @@ typedef struct {
 
 extern uint8_t *framebuffer;
 void fb_init(fb_info_t *fb_info);
+void fb_debug_print(fb_info_t *fbi);
 void fb_demo_2(fb_info_t *fbi);
+void fb_demo_3(fb_info_t *fbi);
+void fb_demo_4(fb_info_t *fbi);
 void set_pixel(int x, int y, unsigned int color);
-void clear_screen(fb_info_t *fb_info);
+
+extern fb_info_t *framebuffer_info;
 #endif

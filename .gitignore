@@ -4,3 +4,5 @@ include/generated/*.h
 build/
 # kernel image
 iso/bootImage.elf
+# old config
+.config.old
