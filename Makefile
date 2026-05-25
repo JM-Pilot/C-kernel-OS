@@ -7,7 +7,7 @@ OBJECTS := $(patsubst src/%.c,build/%.o,$(wildcard src/*.c)) $(patsubst src/%.s,
 
 MAJOR = 0
 MINOR = 04
-PATCH = 0
+PATCH = 1
 ADDITIONAL = -beta
 
 .NOTPARALLEL:

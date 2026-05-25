@@ -299,13 +299,18 @@ void kmain(int magic, mbinfo_t *mbi) {
 			} else if (strncmp(command, "oopstest", 8) == 0) {
 				oops("User-triggered oops");
 			} else if (strncmp(command, "delaytest", 9) == 0) {
-				printk(0, "test #1: wait 500 ms");
+				uint32_t ms_elapsed[3] = {0};
+				uint32_t time = uptime_ticks/10;
 				delay(500);
-				printk(0, "done, test #2: wait 1 second");
+				ms_elapsed[0] = uptime_ticks/10-time;
+				time = uptime_ticks/10;
 				delay(1000);
-				printk(0, "done, test #3: wait 5 seconds");
+				ms_elapsed[1] = uptime_ticks/10-time;
+				time = uptime_ticks/10;
 				delay(5000);
-				printk(0, "done, all tests passed!");
+				ms_elapsed[2] = uptime_ticks/10-time;
+				printf("done, all tests passed!\n");
+				printf("test 0 (500 ms): %d\ntest 1 (1 sec): %d\ntest 2 (5 sec): %d\n", ms_elapsed[0], ms_elapsed[1], ms_elapsed[2]);
 			/*} else if (strncmp(command, "get_fb", 6) == 0) {
 				fb_init(fb_info);*/
 			} else if (strncmp(command, "fb_demo", 7) == 0) {
