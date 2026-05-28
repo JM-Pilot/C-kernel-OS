@@ -44,11 +44,6 @@ void parse_cmdline(char *input) {
 	while ((a = __split_cmdline(&b))) {
 		if (*a == '\0') continue;
 		printk(6, "Received command line argument: %s", a);
-		// FIXME: serial input doesn't work!
-		/*if (strcmp(a, "s_in") == 0) {
-			serial_in = true;
-			printk("Serial input enabled");
-		} else*/ 
 		if (strcmp(a, "shut_up") == 0) {
 			printk(7, "Shh");
 			loglevel = 2;
@@ -103,6 +98,9 @@ void kmain(int magic, mbinfo_t *mbi) {
 	//char string_thing[12] = {0};
 	//ftoa(0.25, string_thing);
 	//puts(string_thing);
+	/*
+	 * do not even attempt to remove the comments above.
+	 */
 	set_post(0x3E);
 	fb_info->flags = mbi->flags;
 	fb_info->w = mbi->fb_width;
@@ -149,7 +147,6 @@ void kmain(int magic, mbinfo_t *mbi) {
 	debug_info_print();
 	printk(5, "Command line: %s", cmdline);
 	printk(6, "Initialized serial at %x (COM1) and %x (COM2)", UART1, UART2);
-	//char *strings[16];
 	// FIXME: magic is 0
 	//if (magic != 0x1BADB002) panic("Incorrect Multiboot 1 magic number! Got 0x%x, should be 0x1BADB002", magic);
 	fb_debug_print(fb_info);
@@ -179,10 +176,6 @@ void kmain(int magic, mbinfo_t *mbi) {
 	printk(6, "Remapped the PIC");
 	init_idt();
 	printk(6, "IDT initialized");
-	//unsigned int strn = (unsigned int)split(cmdline, ' ', strings, 15);
-	//for (unsigned int i = 0; /*i < (sizeof(strings)/sizeof(strings[0]))*/ i < strn; i++) {
-	//	printk("cmdline of %x: %s", i, strings[i]);
-	//}
 	__asm__ volatile ("sti");
 	printk(6, "Set interrupts");
 	init_pit();
@@ -206,14 +199,11 @@ void kmain(int magic, mbinfo_t *mbi) {
 #endif
 	printk(0, "Welcome to CkOS!");
 	set_post(0x00);
-	//putc(scancode_to_c(kb_get_scancode()));
 	//panic("This PC is ass."); // compile with this uncommented to prank people :)
 	int index = 0;
-	//int lastchar = 0;
 	printf("$ ");
 	for (;;) {
 		flush_term();
-		//char c = loop_until_keypress();
 		char c = kbc; // from globals
 		__asm__ volatile ("pause");
 		if (c) { if (c != '\b') { putc(c); } kbc = 0; } else { __asm__ volatile ("hlt"); continue; }
@@ -229,16 +219,9 @@ void kmain(int magic, mbinfo_t *mbi) {
 		if (c == 0x1A || c == 0x1B || c == 0x1E || c == 0x1F) { // all of these are arrow keys
 			continue; // arrow handling is painful in our world
 		}
-		/*if (c == 0x1A) {
-			if (index > 0) {
-				index--;
-			}
-			continue;
-		}*/
 		if (c != '\n' && index < 256) {
 			command[index++] = c;
-			command[index] = '\0'; // lastchar
-			//lastchar++;
+			command[index] = '\0';
 		}
 		if (c == '\n') {
 			if (strncmp(command, "help", 4) == 0) {
@@ -253,9 +236,11 @@ void kmain(int magic, mbinfo_t *mbi) {
 				"clear: clear the screen\n"
 				"panictest: test the panic functionality\n"
 				"crash: triggers a crash\n"
+				"credits: show credits\n"
 				"cpuinfo: get CPU info\n"
 				"delaytest: test delay functions\n"
-				"fb_demo: framebuffer demo\n");
+				"fb_demo: framebuffer demo\n"
+				"uptime: get OS uptime\n");
 			} else if (strncmp(command, "hello", 5) == 0) {
 				printf("Hello, World!\n");
 			} else if (strncmp(command, "poweroff", 8) == 0) {
@@ -268,8 +253,6 @@ void kmain(int magic, mbinfo_t *mbi) {
 			} else if (strncmp(command, "halt", 4) == 0) {
 				printf("System halted. It is now safe to power off.\n");
 				while (1) halt();
-			} else if (strncmp(command, "waitint", 7) == 0) {
-				__asm__ volatile ("hlt");
 			} else if (strncmp(command, "logo", 4) == 0) {
 				set_color(0x00000000, 0x00FFFFFF);
 				printf("%s\n", logo);
@@ -280,12 +263,9 @@ void kmain(int magic, mbinfo_t *mbi) {
 				panic("User-triggered panic");
 			} else if (strncmp(command, "clear", 5) == 0) {
 				clear_screen();
-			} else if (strncmp(command, "exit", 4) == 0) {
-				for (;;) halt();
 			} else if (strncmp(command, "credits", 7) == 0) {
 				printf(credits);
 			} else if (strncmp(command, "crash", 5) == 0) {
-				//__asm__ volatile ("int $0");
 				__asm__ volatile ("int3");
 			} else if (strncmp(command, "cpuinfo", 7) == 0) {
 				printf("CPU vendor: '%s', friendly name '%s'\n", get_cpu_vendor(), get_cpu_vendor_user());
@@ -311,12 +291,10 @@ void kmain(int magic, mbinfo_t *mbi) {
 				ms_elapsed[2] = uptime_ticks/10-time;
 				printf("done, all tests passed!\n");
 				printf("test 0 (500 ms): %d\ntest 1 (1 sec): %d\ntest 2 (5 sec): %d\n", ms_elapsed[0], ms_elapsed[1], ms_elapsed[2]);
-			/*} else if (strncmp(command, "get_fb", 6) == 0) {
-				fb_init(fb_info);*/
 			} else if (strncmp(command, "fb_demo", 7) == 0) {
 #ifdef CONFIG_ANIMATIONS
 #if CONFIG_ANIMATIONS
-				if (!command[8]) printf("Please pick a demo by passing a digit as a command argument. Available demos: 0, 1\n");
+				if (!command[8]) printf("Please pick a demo by passing a digit as a command argument. Available demos: 0, 1, 2\n");
 				if (command[8] == '0') fb_demo_2(fb_info);
 				if (command[8] == '1') fb_demo_3(fb_info);
 				if (command[8] == '2') fb_demo_4(fb_info);

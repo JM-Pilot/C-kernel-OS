@@ -7,7 +7,7 @@ OBJECTS := $(patsubst src/%.c,build/%.o,$(wildcard src/*.c)) $(patsubst src/%.s,
 
 MAJOR = 0
 MINOR = 04
-PATCH = 1
+PATCH = 2
 ADDITIONAL = -beta
 
 .NOTPARALLEL:
@@ -34,6 +34,7 @@ build:
 include/generated/config.h: .config | build
 	@echo "Config has been changed. Regenerating"
 	@scripts/gen_conf.sh $(MAJOR) $(MINOR) $(PATCH) "$(ADDITIONAL)"
+	@echo "Config regenerated"
 
 build/%.o: src/%.c include/generated/config.h | build
 	@echo "Compiling $<"
