@@ -1,9 +1,9 @@
 CCFLAGS = -target i386-elf -fno-pie -fno-pic -Wunused -Wall -Wextra
 CCFLAGSC = -ffreestanding -target i386-elf -fno-exceptions -fno-stack-protector -fno-align-functions -fno-pie -fno-pic -fno-unwind-tables -fno-asynchronous-unwind-tables -I include -nostdlib -Wall -Wextra -fno-ident -Wunused -O3 -msse2
-SRC_C := $(wildcard src/*.c)
-SRC_S := $(wildcard src/*.s)
-SRC_ASM := $(wildcard src/*.asm)
-OBJECTS := $(patsubst src/%.c,build/%.o,$(wildcard src/*.c)) $(patsubst src/%.s,build/%.o,$(wildcard src/*.s)) $(patsubst src/%.asm,build/%.o,$(SRC_ASM)) build/font_file.o
+SRC_C := $(shell find src -name '*.c')
+SRC_S := $(shell find src -name '*.s')
+SRC_ASM := $(shell find src -name '*.asm')
+OBJECTS := $(patsubst src/%.c,build/src/%.o,$(SRC_C)) $(patsubst src/%.s,build/src/%.o,$(SRC_S)) $(patsubst src/%.asm,build/src/%.o,$(SRC_ASM)) build/font_file.o
 
 MAJOR = 0
 MINOR = 04
@@ -16,8 +16,8 @@ ADDITIONAL = -beta
 all: build build/boot.iso
 
 build:
-	@echo "Create build/"
-	@mkdir -p build
+	@echo "Create build/ subdirectories"
+	@mkdir -p build/src/dev build/src/kernel build/src/stdlib
 	@echo "Create include/generated/"
 	@mkdir -p include/generated
 	@echo "Setting script permissions"
@@ -36,15 +36,15 @@ include/generated/config.h: .config | build
 	@scripts/gen_conf.sh $(MAJOR) $(MINOR) $(PATCH) "$(ADDITIONAL)"
 	@echo "Config regenerated"
 
-build/%.o: src/%.c include/generated/config.h | build
+build/src/%.o: src/%.c include/generated/config.h | build
 	@echo "Compiling $<"
 	@clang -c $< -o $@ $(CCFLAGSC)
 
-build/%.o: src/%.s | build
+build/src/%.o: src/%.s | build
 	@echo "Assembling $<"
 	@clang -c $< -o $@ $(CCFLAGS)
 
-build/%.o: src/%.asm | build
+build/src/%.o: src/%.asm | build
 	@echo "Assembling $<"
 	@nasm -f elf32 $< -o $@
 
@@ -54,7 +54,9 @@ build/font_file.o: fonts/default_8x16.psf | build
 
 build/bootImage.elf: $(OBJECTS)
 	@echo "Linking the kernel"
-	@ld.lld -m elf_i386 -T kernel.ld $(OBJECTS) -o build/bootImage.elf
+	@ld.lld -m elf_i386 -T kernel.ld $(OBJECTS) -o build/bootImage.unstripped.elf
+	@echo "Stripping the kernel"
+	@$(CROSS)strip -s build/bootImage.unstripped.elf -o build/bootImage.elf
 
 build/boot.iso: build/bootImage.elf
 	@echo "Copying kernel"

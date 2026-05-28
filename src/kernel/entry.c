@@ -268,6 +268,7 @@ void kmain(int magic, mbinfo_t *mbi) {
 			} else if (strncmp(command, "crash", 5) == 0) {
 				__asm__ volatile ("int3");
 			} else if (strncmp(command, "cpuinfo", 7) == 0) {
+				get_cpu_brand(brand);
 				printf("CPU vendor: '%s', friendly name '%s'\n", get_cpu_vendor(), get_cpu_vendor_user());
 				printf("CPU brand: '%s'\n", brand);
 				struct cpufreq_s _temp = get_cpu_clk();
