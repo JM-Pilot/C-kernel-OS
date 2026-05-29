@@ -27,7 +27,6 @@ int poweroff() {
 	outw(0x604, 0x2000); // new QEMU
 	outw(0xB004, 0x2000); // bochs and old QEMU
 	outw(0x4004, 0x3400); // virtualbox (ew)
-	outw(0x600, 0x34); // Cloud Hypervisor
 	return 1;
 }
 
