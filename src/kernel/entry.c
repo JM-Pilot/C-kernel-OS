@@ -329,7 +329,7 @@ void kmain(int magic, mbinfo_t *mbi) {
 					printf("%d hours, ", uptime_hours % 24);
 				}
 				if (uptime_minutes == 1) {
-					printf("1 minute");
+					printf("1 minute and ");
 				} else if (uptime_minutes > 1) {
 					printf("%d minutes and ", uptime_minutes % 60);
 				}
