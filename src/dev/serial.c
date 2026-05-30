@@ -70,6 +70,7 @@ int transmit_fifo_empty_com2() {
 }
 
 void sputc(char c) {
+	if (c == '\n') sputc('\r');
 	if (serial_com1) {
 		while (!transmit_fifo_empty_com1());
 		outb(COM1, c);
