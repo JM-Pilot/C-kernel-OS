@@ -1,5 +1,5 @@
 # 1 - Drivers
-There isn't much to this OS and drivers. After all this is below 2k lines.
+There isn't much to this OS and drivers. After all this is below 5k lines.
 
 But the driver list is as follows:
 - kb: Keyboard
