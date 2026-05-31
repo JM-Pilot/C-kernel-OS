@@ -277,8 +277,8 @@ void kmain(int magic, mbinfo_t *mbi) {
 				*cpufreq = _temp;
 				printf("CPU clock speeds (CPUID EAX=16h):\nBase: %d MHz, max: %d MHz, Bus: %d MHz\n", cpufreq->base, cpufreq->max, cpufreq->bus);
 				// FIXME
-				unsigned int clk_d = get_cpu_clk_d();
-				printf("TSC-based clock speed: %d\n", clk_d);
+				//unsigned int clk_d = get_cpu_clk_d();
+				//printf("TSC-based clock speed: %d\n", clk_d);
 			} else if (strncmp(command, "oopstest", 8) == 0) {
 				oops("User-triggered oops");
 			} else if (strncmp(command, "delaytest", 9) == 0) {
@@ -340,11 +340,10 @@ void kmain(int magic, mbinfo_t *mbi) {
 				set_pcspkr_frequency(440);
 				delay(500);
 				no_pcspkr();
-			} else if (index > 0) { // lastchar
+			} else if (index > 0) {
 				printf("Invalid command: %s\n", command);
 			}
 			index = 0;
-			//lastchar = 0;
 			for (uint32_t i = 0; i < 256; i++) {
 				command[i] = '\0';
 			}

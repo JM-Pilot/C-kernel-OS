@@ -19,7 +19,7 @@ const char *credits =
 "Credits:\n"
 "        axrxvm: numerous helpful resources about aOS\n"
 "      oslayout: gave me a copy of PotatoOS for studying\n"
-"           you: for usage of this experimental OS";
+"           you: for usage of this experimental OS\n";
 char serial_in = false; // true and false is defined in stdlib.h. while this is not the C standard, it makes you have to import less headers.
 char serial_out = false;
 char serial_com1 = false;
