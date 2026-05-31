@@ -18,6 +18,7 @@
 #include <stddef.h> // Stuff like uint8_t
 #include <font.h> // Framebuffer functions
 #include <generated/config.h> // Kernel config (obviously)
+#include <pcspkr.h>
 
 static fb_info_t fb_info_real;
 static color_info_t color_info_real;
@@ -334,6 +335,10 @@ void kmain(int magic, mbinfo_t *mbi) {
 					printf("%d minutes and ", uptime_minutes % 60);
 				}
 				printf("%d seconds\n", uptime_secs % 60);
+			} else if (strncmp(command, "beep", 4) == 0) {
+				set_pcspkr_frequency(440);
+				delay(500);
+				no_pcspkr();
 			} else if (index > 0) { // lastchar
 				printf("Invalid command: %s\n", command);
 			}
