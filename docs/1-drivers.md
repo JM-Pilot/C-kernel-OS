@@ -9,6 +9,7 @@ But the driver list is as follows:
 - serial: Serial I/O
 - port: Raw PMIO
 - cpu: CPU info getters
+- pcspkr: The PC speaker (buzzer)
 
 ## Keyboard
 <details>
@@ -109,4 +110,39 @@ This pseudo-driver is just getters, where:
 - `void get_cpu_vendor(void)`: saves the CPU vendor in a 13-byte string (12 bytes + NUL)
 
 - `char *get_cpu_vendor_user(void)`: returns the friendly CPU vendor
+</details>
+
+## PC speaker
+<details>
+<summary>Click for details</summary>
+
+*For the rest of this page, "PC speaker" refers to the built in buzzer in IBM PC-compatibles*
+  
+This driver is for driving the PC speaker's coil. We have a lot of simplification in this case; the PIT channel 2 is for specifically driving the speaker.
+
+Enabling the speaker is as simple as setting the frequency:
+
+```c
+outb(0x43, 0xB6);
+uint16_t div = 1193182/frequency;
+outb(0x42, div & 0xFF);
+outb(0x42, div >> 8);
+```
+
+Followed by enabling the speaker:
+
+```c
+uint8_t tmp = inb(0x61);
+if ((tmp & 3) != 3) outb(0x61, tmp | 3);
+```
+
+And if you want to stop the speaker:
+
+```c
+uint8_t tmp = inb(0x61);
+outb(0x61, tmp & ~3);
+```
+
+Otherwise, you'd have to manually toggle the coil energized pin. That's what used to be done in DOS-era games; this stressed the CPU a lot, and it could barely do anything else.
+
 </details>
