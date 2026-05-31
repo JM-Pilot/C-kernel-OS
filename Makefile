@@ -80,12 +80,6 @@ qemu-debug:
 	@echo "Running in QEMU (highly debugged)"
 	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial stdio -d int,cpu,out_asm
 
-cl:
-	@echo -n "lines of true code: "
-	@grep -R "" src/*.c src/*.s src/*.asm include/*.h | wc -l
-	@echo -n "lines of code in total: "
-	@grep -R "" src/*.c src/*.s src/*.asm include/*.h Makefile iso/boot/grub/grub.cfg scripts/*.sh Kconfig | wc -l
-
 menuconfig:
 	@kconfig-mconf Kconfig
 
