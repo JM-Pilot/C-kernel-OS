@@ -13,7 +13,7 @@ ADDITIONAL = -beta
 .NOTPARALLEL:
 .PHONY: build
 
-all: build build/boot.iso
+all: build build/boot.iso.gz
 
 build:
 	@echo "Create build/ subdirectories"
@@ -63,6 +63,10 @@ build/boot.iso: build/bootImage.elf
 	@cp build/bootImage.elf iso
 	@echo "Make bootable ISO"
 	@grub-mkrescue -d /usr/lib/grub/i386-pc -o build/boot.iso iso
+
+build/boot.iso.gz: build/boot.iso
+	@echo "Compressing ISO for distribution"
+	@gzip -f9k build/boot.iso
 
 clean:
 	@echo "Cleaning..."
