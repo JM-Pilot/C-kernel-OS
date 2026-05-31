@@ -204,7 +204,6 @@ void kmain(int magic, mbinfo_t *mbi) {
 	int index = 0;
 	printf("$ ");
 	for (;;) {
-		flush_term();
 		char c = kbc; // from globals
 		__asm__ volatile ("pause");
 		if (c) { if (c != '\b') { putc(c); } kbc = 0; } else { __asm__ volatile ("hlt"); continue; }
@@ -214,6 +213,7 @@ void kmain(int magic, mbinfo_t *mbi) {
 				command[index] = '\0';
 				putc('\b');
 			}
+			flush_term();
 			//lastchar--;
 			continue;
 		}
@@ -224,6 +224,7 @@ void kmain(int magic, mbinfo_t *mbi) {
 			command[index++] = c;
 			command[index] = '\0';
 		}
+		flush_term();
 		if (c == '\n') {
 			if (strncmp(command, "help", 4) == 0) {
 				printf("The commands are:\n"
