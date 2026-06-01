@@ -204,25 +204,24 @@ void fb_demo_4(fb_info_t *fbi) {
 #endif
 #endif /* CONFIG_ANIMATIONS */
 
-void fb_init(fb_info_t *fbi) {
+void fb_init(fb_info_t *fbi, char can_font_init) {
 	framebuffer_info = fbi;
 	uint32_t *framebuffer = 0;
 	(void)framebuffer;
-	if (fbi->flags & (1 << 12) && fbi->type == 1) {
-		if (fbi->bpp != 32) panic("Incorrect framebuffer type");
-		framebuffer = fbi->fb; //(uint8_t*)(uintptr_t)fb;
-		printk(4, "Framebuffer info found!");
-		//fb_demo_2(fbi);
-	} else {
-		printk(2, "Framebuffer info unavailable!");
-	}
+	printk(5, "Size: %dx%dx%d", fbi->w, fbi->h, fbi->bpp);
+	if (fbi->bpp != 32) panic("Incorrect framebuffer type");
+	framebuffer = fbi->fb; //(uint8_t*)(uintptr_t)fb;
+	printk(4, "Framebuffer info found!");
 	printk(6, "Initialized framebuffer");
-	font_init();
-	font_initialized = 1;
+	if (can_font_init) {
+		font_init();
+		font_initialized = 1;
+	}
 	printk(6, "Framebuffer is at %x", fbi->fb);
 	printk(6, "Size: %dx%dx%d", fbi->w, fbi->h, fbi->bpp);
 	printk(6, "Multiboot flags: %x", fbi->flags);
-	printk(6, "Framebuffer font system initialized");
+	if (font_initialized) printk(6, "Framebuffer font system initialized");
+	else printk(6, "Framebuffer font system NOT initialized");
 	return;
 }
 

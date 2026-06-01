@@ -74,7 +74,7 @@ typedef struct {
 } fb_info_t;
 
 extern uint8_t *framebuffer;
-void fb_init(fb_info_t *fb_info);
+void fb_init(fb_info_t *fb_info, char can_font_init);
 void fb_debug_print(fb_info_t *fbi);
 void fb_demo_2(fb_info_t *fbi);
 void fb_demo_3(fb_info_t *fbi);

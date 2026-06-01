@@ -1,13 +1,37 @@
-.section .multiboot
-.align 4
-.long 0x1BADB002
-.long (1 << 2) | (1 << 1)
-.long -(0x1BADB002 + ((1 << 2) | 1 << 1)) & 0xFFFFFFFF
-.skip 24
+.section .multiboot, "a"
+.align 8
+multiboot_header:
+.align 8
+.long 0xE85250D6
 .long 0
+.long multiboot_head_end - multiboot_header
+.long -(0xE85250D6+0+(multiboot_head_end-multiboot_header))
+
+.align 8
+.short 5
+.short 0
+.long 20
 .long 1920
 .long 1080
 .long 32
+
+.align 8
+.short 0
+.short 0
+.long 8
+multiboot_head_end:
+
+#.align 4
+#.long 0x1BADB002
+#.long (1 << 2) | (1 << 1)
+#.long -(0x1BADB002 + ((1 << 2) | 1 << 1)) & 0xFFFFFFFF
+#.skip 24
+#.long 0
+#.long 1920
+#.long 1080
+#.long 32
+
+
 #.long 1024
 #.long 768
 #.long 32

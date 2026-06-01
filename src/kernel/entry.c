@@ -50,7 +50,7 @@ void parse_cmdline(char *input) {
 			loglevel = 2;
 		} else if (strcmp(a, "s_out") == 0) {
 			serial_out = true;
-			sputs("\e[0m\e[H\e[J\e[1J\e[2J\r\e[=7h\e[?25h");
+			//sputs("\e[0m\e[H\e[J\e[1J\e[2J\r\e[=7h\e[?25h");
 			/*
 			 * In order:
 			 * '\e[0m'            disable all modes
@@ -88,7 +88,7 @@ struct cpufreq_s *cpufreq;
 char *no_fb_err = "A framebuffer is required to continue. If you have serial, boot logs will go there.";
 char command[256] = {0};
 
-void kmain(int magic, mbinfo_t *mbi) {
+void kmain(int magic, uint32_t *mbi) {
 	(void)magic;
 	//volatile char* video = (volatile char*)0xB8000;
 	//video[0] = 'E';
@@ -103,7 +103,8 @@ void kmain(int magic, mbinfo_t *mbi) {
 	 * do not even attempt to remove the comments above.
 	 */
 	set_post(0x3E);
-	fb_info->flags = mbi->flags;
+
+	/*fb_info->flags = mbi->flags;
 	fb_info->w = mbi->fb_width;
 	fb_info->h = mbi->fb_height;
 	fb_info->bpp = mbi->fb_bpp;
@@ -116,42 +117,63 @@ void kmain(int magic, mbinfo_t *mbi) {
 	color_info->green_size = mbi->fb_gsize;
 	color_info->blue_pos = mbi->fb_bpos;
 	color_info->blue_size = mbi->fb_bsize;
-	fb_info->color_info = color_info;
+	fb_info->color_info = color_info;*/
+	uint32_t *mbi_old = mbi;
 	serial_init();
 	char *cmdline = NULL;
+	char can_font_init = 0;
+	uint8_t *ptr = (uint8_t*)mbi;
+	uint32_t mbi_size = *mbi;
+	ptr += 8;
+	while (ptr < (uint8_t*)mbi+mbi_size) {
+		printk(7, "tag type %d size %d ptr %x", *(uint32_t*)ptr, *(uint32_t*)(ptr+4), ptr);
+		if (!*(uint32_t*)ptr) break;
+		if (*(uint32_t*)ptr == 8) {
+			fb_info->fb = (uint32_t*)(uintptr_t)(*(uint64_t*)(ptr+8));
+			fb_info->pitch = *(uint32_t*)(ptr+16);
+			fb_info->w = *(uint32_t*)(ptr+20);
+			fb_info->h = *(uint32_t*)(ptr+24);
+			fb_info->bpp = *(uint8_t*)(ptr+28);
+			if (fb_info->bpp == 32) can_font_init = 1;
+			fb_init(fb_info, can_font_init);
+		} else if (*(uint32_t*)ptr == 1) {
 #ifdef CONFIG_CMDLINE_STR
 #if CONFIG_CMDLINE
-	cmdline = CONFIG_CMDLINE_STR;
+			cmdline = CONFIG_CMDLINE_STR;
 #endif
 #else
 #if !CONFIG_CMDLINE
-	if (mbi->flags & (1 << 2)) {
-		cmdline = (char*)mbi -> cmdline;
-	}
+			cmdline = (char*)(ptr+8);
 #else
 #error "possible config corruption"
 #endif
 #endif
+		} else if (*(uint32_t*)ptr == 2) {
+			printk(6, "Booting via %s", (char*)(ptr+8));
+		}
+		ptr += (*(uint32_t*)(ptr+4)+7) & ~7;
+	}
 	//printk(6, "---BEGIN Command line info---");
 	parse_cmdline(cmdline);
 	//printk(4, "Parsed command line provided by bootloader");
 	//printk(6, "--- END Command line info ---");
 	printk(0, "Hello, hello!");
-	if (!(mbi->flags & (1<<12))) {
+	printk(0, "%x %x %x %x", (uint32_t)mbi_old, (uint32_t)mbi, (uint32_t)ptr, (uint32_t)can_font_init);
+	/*if (!(mbi->flags & (1<<12))) {
 		for (int i = 0; *no_fb_err; i++) {
 			vga_old_putc(*no_fb_err++, i);
 		}
 		printk(3, "No VBE framebuffer is usable.");
 	} else {
 		fb_init(fb_info);
-	}
+	}*/
 	debug_info_print();
 	printk(5, "Command line: %s", cmdline);
 	printk(6, "Initialized serial at %x (COM1) and %x (COM2)", UART1, UART2);
 	// FIXME: magic is 0
 	//if (magic != 0x1BADB002) panic("Incorrect Multiboot 1 magic number! Got 0x%x, should be 0x1BADB002", magic);
 	fb_debug_print(fb_info);
-	uint8_t *mmap = (uint8_t*)mbi->memmap_addr;
+	/*uint8_t *mmap = (uint8_t*)mbi->memmap_addr;
 	uint8_t *mmap_end = mmap + mbi->memmap_length;
 	while (mmap < mmap_end) {
 		mb_memmap_t *entry = (mb_memmap_t*)mmap;
@@ -168,7 +190,7 @@ void kmain(int magic, mbinfo_t *mbi) {
 		if (!type || type > 6) user_type = "Unknown";
 		printk(4, "Memory [%x-%x] is of type %s", base, end, user_type);
 		mmap += entry->size + sizeof(entry->size);
-	}
+	}*/
 	kb_init();
 	printk(6, "Initialized PS/2 BIOS keyboard");
 	gdt_init();
