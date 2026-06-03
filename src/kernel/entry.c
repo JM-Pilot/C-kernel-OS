@@ -150,6 +150,10 @@ void kmain(int magic, uint32_t *mbi) {
 #endif
 		} else if (*(uint32_t*)ptr == 2) {
 			printk(6, "Booting via %s", (char*)(ptr+8));
+		} else if (*(uint32_t*)ptr == 14) {
+			unsigned char rsdp_sign[9] = {0};
+			memcpy(rsdp_sign, ptr+8, 8);
+			printk(6, "RSDP signature: '%s', revision %d, RSDP at %x", &rsdp_sign, (uint32_t)*(ptr+23), *(uint32_t*)(ptr+24));
 		}
 		ptr += (*(uint32_t*)(ptr+4)+7) & ~7;
 	}
@@ -199,10 +203,10 @@ void kmain(int magic, uint32_t *mbi) {
 	printk(6, "Remapped the PIC");
 	init_idt();
 	printk(6, "IDT initialized");
-	__asm__ volatile ("sti");
-	printk(6, "Set interrupts");
 	init_pit();
 	printk(6, "Initialized PIT at 10 KHz");
+	__asm__ volatile ("sti");
+	printk(6, "Set interrupts");
 	printk(7, "isr6(): %x", isr6);
 	printk(7, "isr0(): %x", isr0);
 	printk(7, "CPU: %s", get_cpu_vendor());
@@ -360,7 +364,7 @@ void kmain(int magic, uint32_t *mbi) {
 				printf("%d seconds\n", uptime_secs % 60);
 			} else if (strncmp(command, "beep", 4) == 0) {
 				set_pcspkr_frequency(440);
-				delay(500);
+				delay(250);
 				no_pcspkr();
 			} else if (index > 0) {
 				printf("Invalid command: %s\n", command);

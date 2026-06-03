@@ -92,10 +92,10 @@ void fb_demo_2(fb_info_t *fbi) {
 	printk(6, "Done!");
 }
 
-static uint32_t g(uint32_t x, uint32_t y, int o) {
+/*static inline uint32_t g(uint32_t x, uint32_t y, int o) {
 	//for (int i = 0; i < 5; i++) __asm__ volatile ("cpuid" : : : "eax", "ebx", "ecx", "edx");
 	return (x-y+o) << 16;
-}
+}*/
 
 void fb_demo_3(fb_info_t *fbi) {
 	printk(4, "Press 'q' to exit");
@@ -107,9 +107,10 @@ void fb_demo_3(fb_info_t *fbi) {
 	for (int o = 0; o < 1000000; o++) {
 		for (uint32_t y = 0; y < h; y++) {
 			uint32_t *row = (uint32_t*)(fb+y*pitch);
+			uint32_t b = (o-y) << 16;
 			for (uint32_t x = 0; x < w; x++) {
 				//set_pixel(x, y, 0x00000A00 | g(x, y, o));
-				row[x] = 0x00000A00 | g(x, y, o);
+				row[x] = b+(x << 16);
 			}
 		}
 		/*for (int i = 0; i < 500000; i++) {
@@ -125,9 +126,8 @@ void fb_demo_3(fb_info_t *fbi) {
 				clear_screen();
 				printk(6, "User-requested exit.");
 				return;
-			} else {
-				kbc = 0;
 			}
+			kbc = 0;
 		}
 	}
 	clear_screen();

@@ -108,27 +108,43 @@ IRQ_NOCODE 47
 
 
 extern irq_handler
-
+;esp_back resd 4
 common_irq:
-	pusha ; push GPRs
+	cld
+	;pusha ; push GPRs
+	;mov [esp_back], esp
+	push eax
+	push ecx
+	push edx
+	push ebx
+	sub esp, 4 ; original esp
+	push ebp
+	push esi
+	push edi
 	xor eax, eax
 	mov ax, ds
 	push eax
 	mov ax, 0x10
 	mov ds, ax
 	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	cld
 	push esp
 	call irq_handler
 	add esp, 4
+	;pop eax
+	;mov ds, ax
+	;mov es, ax
+	;mov fs, ax
+	;mov gs, ax
+	;popa
+	add esp, 4
+	pop edi
+	pop esi
+	pop ebp
+	add esp, 4
+	pop ebx
+	pop edx
+	pop ecx
 	pop eax
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	popa
 	add esp, 8
 	iret ; NOT just ret - remember, we're in an int
 
