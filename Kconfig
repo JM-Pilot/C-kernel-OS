@@ -62,5 +62,9 @@ config COM2
 config PS2_KB
 	bool "Enable PS/2 keyboard"
 	default y
+config PCSPK
+	bool "Enable PC speaker audio"
+	default y
+comment "Not to confuse with a speaker, like audio jack or optical cables."
 endmenu
 

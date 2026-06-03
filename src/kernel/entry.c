@@ -268,7 +268,9 @@ void kmain(int magic, uint32_t *mbi) {
 				"cpuinfo: get CPU info\n"
 				"delaytest: test delay functions\n"
 				"fb_demo: framebuffer demo\n"
-				"uptime: get OS uptime\n");
+				"uptime: get OS uptime\n"
+				"echo: output a string\n"
+				"beep: make a 250 ms 440 Hz beep\n");
 			} else if (strncmp(command, "hello", 5) == 0) {
 				printf("Hello, World!\n");
 			} else if (strncmp(command, "poweroff", 8) == 0) {
@@ -327,6 +329,7 @@ void kmain(int magic, uint32_t *mbi) {
 				if (command[8] == '0') fb_demo_2(fb_info);
 				if (command[8] == '1') fb_demo_3(fb_info);
 				if (command[8] == '2') fb_demo_4(fb_info);
+				else printf("Invalid demo\n");
 #else
 				printf("Animations are disabled, please recompile if that's a mistake\n");
 #endif
