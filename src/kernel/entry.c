@@ -326,9 +326,9 @@ void kmain(int magic, uint32_t *mbi) {
 #ifdef CONFIG_ANIMATIONS
 #if CONFIG_ANIMATIONS
 				if (!command[8]) printf("Please pick a demo by passing a digit as a command argument. Available demos: 0, 1, 2\n");
-				if (command[8] == '0') fb_demo_2(fb_info);
-				if (command[8] == '1') fb_demo_3(fb_info);
-				if (command[8] == '2') fb_demo_4(fb_info);
+				else if (command[8] == '0') fb_demo_2(fb_info);
+				else if (command[8] == '1') fb_demo_3(fb_info);
+				else if (command[8] == '2') fb_demo_4(fb_info);
 				else printf("Invalid demo\n");
 #else
 				printf("Animations are disabled, please recompile if that's a mistake\n");

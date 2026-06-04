@@ -5,10 +5,12 @@ SRC_S := $(shell find src -name '*.s')
 SRC_ASM := $(shell find src -name '*.asm')
 OBJECTS := $(patsubst src/%.c,build/src/%.o,$(SRC_C)) $(patsubst src/%.s,build/src/%.o,$(SRC_S)) $(patsubst src/%.asm,build/src/%.o,$(SRC_ASM)) build/font_file.o
 
+empty :=
+
 MAJOR = 0
 MINOR = 04
 PATCH = 2
-ADDITIONAL = -beta
+ADDITIONAL = $(empty)
 
 .NOTPARALLEL:
 .PHONY: build
