@@ -14,6 +14,7 @@ menu "Visuals and aesthetic features"
 config ADDITIONAL_VER
 	string "Additional name for the final kernel version"
 	default ""
+comment "Note: VGA text mode is deprecated. If a framebuffer is not accessible, nothing will be seen on the display except a warning."
 comment "Disabling color in framebuffer text mode does not impact color elsewhere"
 	depends on COLOR_FB_TEXT = n
 config COLOR_FB_TEXT

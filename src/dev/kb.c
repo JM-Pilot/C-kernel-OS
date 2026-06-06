@@ -51,6 +51,35 @@ void kb_init() {
 #endif
 }
 
+/*void set_kb_light(char capslock, char numlock, char scrolllock) {
+	__asm__ volatile ("cli");
+	unsigned char data;
+	int timeout = 100000;
+	while ((inb(0x64) & 0x02) && --timeout);
+	if (!timeout) { sti(); return; }
+	outb(0x60, 0xED);
+	timeout = 100000;
+	while (timeout--) {
+		if (!(inb(0x64) & 0x01)) continue;
+		data = inb(0x60);
+		if (data == 0xFA) break;
+		if (data == 0xFE) outb(0x60, 0xED);
+	}
+	if (!timeout) { sti(); return; }
+	timeout = 100000;
+	while ((inb(0x64) & 0x02) && --timeout);
+	if (!timeout) { sti(); return; }
+	outb(0x60, 0 | ((capslock & 0x01) << 2) | ((numlock & 0x01) << 1) | (scrolllock & 0x01));
+	timeout = 100000;
+	while (timeout--) {
+		if (!(inb(0x64) & 0x01)) continue;
+		data = inb(0x60);
+		if (data == 0xFA) break;
+		if (data == 0xFE) outb(0x60, 0 | ((capslock & 0x01) << 2) | ((numlock & 0x01) << 1) | (scrolllock & 0x01));
+	}
+	__asm__ volatile ("sti");
+}*/
+
 void kb_flush_buf() {
 	for (int i = 0; i < 16; i++) {
 		uint8_t status = inb(0x64);
@@ -81,7 +110,7 @@ char scancode_to_c(uint8_t sc) {
 	if (sc == SCANCODE_CTRL_RELEASE) { ctrl = 0; return 0; }
 	if (sc == SCANCODE_ALT_PRESS) { alt = 1; return 0; }
 	if (sc == SCANCODE_ALT_RELEASE) { alt = 0; return 0; }
-	if (sc == SCANCODE_CAPSLOCK)  { capslock = !capslock; return 0; }
+	if (sc == SCANCODE_CAPSLOCK)  { capslock = !capslock; /*set_kb_light(capslock, 0, 0);*/ return 0; }
 	if (sc & 0x80) return 0;
 	if (sc == 0x1C) return '\n';
 	if (sc == 0x0E) return '\b';
@@ -106,11 +135,11 @@ uint8_t kb_get_scancode() {
 	uint8_t status = inb(0x64);
 	for (int i = 0; i < 16; i++) {
 		if (status & 0x01) {
-		uint8_t data = inb(0x60); // keyboard port
+			uint8_t data = inb(0x60); // keyboard port
 			if (status & 0x20) { // mouse data - but we're accessing KB data right? right!
 				return 0;
 			}
-		return data; // data
+			return data; // data
 		}
 	}
 	return 0; // no data

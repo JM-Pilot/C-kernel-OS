@@ -306,3 +306,15 @@ int cprintk(unsigned int pass_loglevel, const char *str, va_list params) {
 	int r = cprintf(buf, params);
 	return r;
 }
+
+void draw_rect(int x, int y, int w, int h, uint32_t color) {
+	uint32_t *fb = framebuffer_info->fb;
+	uint32_t pitch = framebuffer_info->pitch;
+	for (int fy = y; fy < y+h; fy++) {
+		uint32_t *row = fb+(pitch/4*fy);
+		for (int fx = x; fx < x+w; fx++) {
+			row[fx] = color;
+		}
+	}
+}
+

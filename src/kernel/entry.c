@@ -369,6 +369,11 @@ void kmain(int magic, uint32_t *mbi) {
 				set_pcspkr_frequency(440);
 				delay(250);
 				no_pcspkr();
+			} else if (strncmp(command, "square", 6) == 0) {
+				clear_screen();
+				draw_rect(150, 150, 150, 150, 0x00FFFFFF);
+				delay(5000);
+				clear_screen();
 			} else if (index > 0) {
 				printf("Invalid command: %s\n", command);
 			}
