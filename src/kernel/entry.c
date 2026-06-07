@@ -372,7 +372,10 @@ void kmain(int magic, uint32_t *mbi) {
 			} else if (strncmp(command, "square", 6) == 0) {
 				clear_screen();
 				draw_rect(150, 150, 150, 150, 0x00FFFFFF);
-				delay(5000);
+				delay(3000);
+				clear_screen();
+				draw_rect_outline(100, 100, 125, 125, 0x00FFFFFF, 5);
+				delay(3000);
 				clear_screen();
 			} else if (index > 0) {
 				printf("Invalid command: %s\n", command);

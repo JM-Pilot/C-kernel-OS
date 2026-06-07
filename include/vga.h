@@ -16,4 +16,5 @@ int printk(unsigned int pass_loglevel, const char *str, ...);
 int printf(const char *restrict str, ...);
 int cprintk(unsigned int pass_loglevel, const char *str, va_list params);
 void draw_rect(int x, int y, int w, int h, uint32_t color);
+void draw_rect_outline(int x, int y, int w, int h, uint32_t color, int thickness);
 #endif

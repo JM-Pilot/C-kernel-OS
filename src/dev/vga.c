@@ -318,3 +318,9 @@ void draw_rect(int x, int y, int w, int h, uint32_t color) {
 	}
 }
 
+void draw_rect_outline(int x, int y, int w, int h, uint32_t color, int thickness) {
+	draw_rect(x, y, w, thickness, color);
+	draw_rect(x, y+h-thickness, w, thickness, color);
+	draw_rect(x, y, thickness, h, color);
+	draw_rect(x+w-thickness, y, thickness, h, color);
+}
