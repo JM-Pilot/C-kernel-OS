@@ -19,6 +19,7 @@
 #include <font.h> // Framebuffer functions
 #include <generated/config.h> // Kernel config (obviously)
 #include <pcspkr.h>
+#include <math.h>
 
 static fb_info_t fb_info_real;
 static color_info_t color_info_real;
@@ -215,6 +216,17 @@ void kmain(int magic, uint32_t *mbi) {
 	// technically i don't think you have to call it more than once but never too safe :P
 	char brand[13];
 	printk(7, "---> %s", get_cpu_brand(brand));
+	volatile uint32_t pre_test_time = uptime_ticks;
+	for (int i = 0; i < 10000000; i++) __asm__ volatile ("data16 ds cs nopl 0x0(%eax, %eax, 1)");
+	volatile uint32_t post_test_time = uptime_ticks;
+	printk(4, "CPU test passed, took %d ms for a 10 million NOPL repetitions loop", (post_test_time-pre_test_time)/10);
+	uint32_t __uptimeticks = (uint32_t)uptime_ticks;
+	pre_test_time = uptime_ticks;
+	for (int i = 0; i < 10000000; i++) { __uptimeticks = (uint32_t)uptime_ticks; __asm__ volatile ("xorl %[pattern], %[ticks]" : [ticks] "+r" (__uptimeticks) : [pattern] "r" (i) : "cc"); }
+	post_test_time = uptime_ticks;
+	printk(4, "CPU test passed, took %d ms for a 10 million XOR repetitions loop", (post_test_time-pre_test_time)/10);
+	printk(4, "cool ass shopping cart (sqrt) of 4 is %d and of 9 is %d", sqrt(4), sqrt(9));
+	printk(4, "4 is%s a prime and 13 is%s a prime", is_prime(4) ? "" : " not", is_prime(13) ? "" : " not");
 	printk(7, "Hello, World!");
 #ifdef CONFIG_LOGO
 #if CONFIG_LOGO

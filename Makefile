@@ -76,7 +76,7 @@ clean:
 
 qemu:
 	@echo "Running in QEMU"
-	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial mon:vc -serial stdio -vga std -global VGA.vgamem_mb=512
+	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial mon:vc -serial stdio -vga std -global VGA.vgamem_mb=512 -cpu max
 
 qemu-vnc:
 	@echo "Running in QEMU (VNC 1)"
