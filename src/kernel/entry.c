@@ -222,11 +222,14 @@ void kmain(int magic, uint32_t *mbi) {
 	printk(4, "CPU test passed, took %d ms for a 10 million NOPL repetitions loop", (post_test_time-pre_test_time)/10);
 	uint32_t __uptimeticks = (uint32_t)uptime_ticks;
 	pre_test_time = uptime_ticks;
-	for (int i = 0; i < 10000000; i++) { __uptimeticks = (uint32_t)uptime_ticks; __asm__ volatile ("xorl %[pattern], %[ticks]" : [ticks] "+r" (__uptimeticks) : [pattern] "r" (i) : "cc"); }
+	for (int i = 0; i < 10000000; i++) {
+		__uptimeticks = (uint32_t)uptime_ticks;
+		__asm__ volatile ("xorl %[pattern], %[ticks]" : [ticks] "+r" (__uptimeticks) : [pattern] "r" (i) : "cc");
+	}
 	post_test_time = uptime_ticks;
 	printk(4, "CPU test passed, took %d ms for a 10 million XOR repetitions loop", (post_test_time-pre_test_time)/10);
-	printk(4, "cool ass shopping cart (sqrt) of 4 is %d and of 9 is %d", sqrt(4), sqrt(9));
-	printk(4, "4 is%s a prime and 13 is%s a prime", is_prime(4) ? "" : " not", is_prime(13) ? "" : " not");
+	printk(4, "square root of 4 is %d and of 9 is %d", sqrt(4), sqrt(9));
+	printk(4, "4 is%s a prime, 0x7FFFFFFF is%s a prime and 13 is%s a prime", is_prime(4) ? "" : " not", is_prime(0x7FFFFFFF) ? "" : " not", is_prime(13) ? "" : " not");
 	printk(7, "Hello, World!");
 #ifdef CONFIG_LOGO
 #if CONFIG_LOGO
