@@ -12,7 +12,6 @@ MINOR = 04
 PATCH = 2
 ADDITIONAL = $(empty)
 
-.NOTPARALLEL:
 .PHONY: build
 
 all: build build/boot.iso.gz
