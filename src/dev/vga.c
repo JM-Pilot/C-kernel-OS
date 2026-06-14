@@ -284,6 +284,8 @@ int printk(unsigned int pass_loglevel, const char* str, ...) {
 	int j = 0;
 #ifdef CONFIG_PRINTK_TYPE
 #if CONFIG_PRINTK_TYPE
+	//i++;
+	*(buf+(i++)) = '[';
 	i++;
 	switch (pass_loglevel) {
 		case 0:
@@ -313,8 +315,8 @@ int printk(unsigned int pass_loglevel, const char* str, ...) {
 		default:
 			*(buf+i-1) = '?';
 	}
-	*(buf+i) = ' ';
-	i++;
+	*(buf+(i++)) = ']';
+	*(buf+(i++)) = ' ';
 #endif
 #endif
 	while (str[j] && i < 1022) {
@@ -334,8 +336,10 @@ int cprintk(unsigned int pass_loglevel, const char *str, va_list params) {
 	set_ftimestamp(uptime, buf);
 	int i = strlen(buf);
 	int j = 0;
-#ifdef CONFIG_PRINTK_TYPE
-#if CONFIG_PRINTK_TYPE
+	#ifdef CONFIG_PRINTK_TYPE
+	#if CONFIG_PRINTK_TYPE
+	//i++;
+	*(buf+(i++)) = '[';
 	i++;
 	switch (pass_loglevel) {
 		case 0:
@@ -365,10 +369,10 @@ int cprintk(unsigned int pass_loglevel, const char *str, va_list params) {
 		default:
 			*(buf+i-1) = '?';
 	}
-	*(buf+i) = ' ';
-	i++;
-#endif
-#endif
+	*(buf+(i++)) = ']';
+	*(buf+(i++)) = ' ';
+	#endif
+	#endif
 	while (str[j] && i < 1022) {
 		buf[i++] = str[j++];
 	}

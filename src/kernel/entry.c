@@ -104,7 +104,6 @@ void kmain(int magic, uint32_t *mbi) {
 	 * do not even attempt to remove the comments above.
 	 */
 	set_post(0x3E);
-	serial_out = true;
 
 	/*fb_info->flags = mbi->flags;
 	fb_info->w = mbi->fb_width;
