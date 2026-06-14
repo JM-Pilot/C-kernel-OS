@@ -33,6 +33,9 @@ config ANIMATIONS
 config PRINTK_TIME
 	bool "Show timestamp in printk logs"
 	default y
+config PRINTK_TYPE
+	bool "Show a letter after timestamp displaying the loglevel (ugly)"
+	default n
 config LOGO
 	bool "Show the CkOS text graphic at bootup"
 	default y

@@ -104,6 +104,7 @@ void kmain(int magic, uint32_t *mbi) {
 	 * do not even attempt to remove the comments above.
 	 */
 	set_post(0x3E);
+	serial_out = true;
 
 	/*fb_info->flags = mbi->flags;
 	fb_info->w = mbi->fb_width;
@@ -177,7 +178,10 @@ void kmain(int magic, uint32_t *mbi) {
 	printk(6, "Initialized serial at %x (COM1) and %x (COM2)", UART1, UART2);
 	// FIXME: magic is 0
 	//if (magic != 0x1BADB002) panic("Incorrect Multiboot 1 magic number! Got 0x%x, should be 0x1BADB002", magic);
-	fb_debug_print(fb_info);
+	if (serial_out) {
+		printk(4, "Printing framebuffer info for serial console");
+		fb_debug_print(fb_info);
+	}
 	/*uint8_t *mmap = (uint8_t*)mbi->memmap_addr;
 	uint8_t *mmap_end = mmap + mbi->memmap_length;
 	while (mmap < mmap_end) {
