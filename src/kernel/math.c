@@ -1,14 +1,14 @@
 #include <math.h>
 
 int sqrt(int n) {
-	float a = n;
-	float b = 1;
-	float e = 0.000001;
-	while (a-b > e) {
-		a = (a+b)/2;
-		b = n/a;
+	if (n <= 0) return 0;
+	int x = n;
+	int y = (x+1)/2;
+	while (y < x) {
+		x = y;
+		y = (x+n/x)/2;
 	}
-	return a;
+	return x;
 }
 
 char is_prime(int n) {
