@@ -78,7 +78,7 @@ build/font_file.o: fonts/default_8x16.psf | build
 
 build/bootImage.elf: $(OBJECTS)
 	@echo "Linking the kernel"
-	@ld.lld -m elf_i386 -T kernel.ld $(OBJECTS) -o build/bootImage.unstripped.elf
+	ld.lld -m elf_i386 -T kernel.ld $(OBJECTS) -o build/bootImage.unstripped.elf
 	@echo "Stripping the kernel"
 	@$(CROSS)strip -s build/bootImage.unstripped.elf -o build/bootImage.elf
 
