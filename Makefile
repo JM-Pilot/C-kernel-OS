@@ -53,7 +53,7 @@ build:
 
 include/generated/config.h: .config | build
 	@echo "Config has been changed. Regenerating"
-	scripts/gen_conf.sh $(MAJOR) $(MINOR) $(PATCH) "$(ADDITIONAL)"
+	@scripts/gen_conf.sh $(MAJOR) $(MINOR) $(PATCH) "$(ADDITIONAL)"
 	@echo "Config regenerated"
 
 # the compiler has the authority to show its logs

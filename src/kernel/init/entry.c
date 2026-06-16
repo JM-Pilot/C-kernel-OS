@@ -78,6 +78,9 @@ void debug_info_print() {
 	printk(6, ver); printk(6, "Build #%d by %s", BUILD_NUMBER, CKOS_BLD);
 	printk(6, "Git source tree commit hash: %s", GIT_SOURCE_HASH);
 	printk(6, "Kernel entry offset: %x, image offset: %x", _start, 1024*1024);
+	printk(6, "Compiler: %s", compiler);
+	if (c_version) printk(6, "Compiled with C%d", c_version);
+	if (compiler_ver[0] || compiler_ver[1] || compiler_ver[2]) printk(6, "%s %d.%d.%d", compiler, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 	printk(7, "Made by orca.pet3910YT with %s", "\x03");
 }
 
@@ -104,21 +107,6 @@ void kmain(int magic, uint32_t *mbi) {
 	 * do not even attempt to remove the comments above.
 	 */
 	set_post(0x3E);
-
-	/*fb_info->flags = mbi->flags;
-	fb_info->w = mbi->fb_width;
-	fb_info->h = mbi->fb_height;
-	fb_info->bpp = mbi->fb_bpp;
-	fb_info->fb = (uint32_t*)(uintptr_t)mbi->fb_addr;
-	fb_info->type = mbi->fb_type;
-	fb_info->pitch = mbi->fb_pitch;
-	color_info->red_pos = mbi->fb_rpos;
-	color_info->red_size = mbi->fb_rsize;
-	color_info->green_pos = mbi->fb_gpos;
-	color_info->green_size = mbi->fb_gsize;
-	color_info->blue_pos = mbi->fb_bpos;
-	color_info->blue_size = mbi->fb_bsize;
-	fb_info->color_info = color_info;*/
 	uint32_t *mbi_old = mbi;
 	serial_init();
 	char *cmdline = NULL;
@@ -126,23 +114,22 @@ void kmain(int magic, uint32_t *mbi) {
 	uint8_t *ptr = (uint8_t*)mbi;
 	uint32_t mbi_size = *mbi;
 	ptr += 8;
+	// while the current tag pointer isn't past the end
 	while (ptr < (uint8_t*)mbi+mbi_size) {
 		printk(7, "tag type %d size %d ptr %x", *(uint32_t*)ptr, *(uint32_t*)(ptr+4), ptr);
 		if (!*(uint32_t*)ptr) break;
 		if (*(uint32_t*)ptr == 8) {
+			// set up framebuffer
 			fb_info->fb = (uint32_t*)(uintptr_t)(*(uint64_t*)(ptr+8));
 			fb_info->pitch = *(uint32_t*)(ptr+16);
 			fb_info->w = *(uint32_t*)(ptr+20);
 			fb_info->h = *(uint32_t*)(ptr+24);
 			fb_info->bpp = *(uint8_t*)(ptr+28);
 			if (fb_info->bpp == 32) can_font_init = 1;
+			// initialize framebuffer from data above
 			fb_init(fb_info, can_font_init);
 		} else if (*(uint32_t*)ptr == 1) {
-#ifdef CONFIG_CMDLINE_STR
-#if CONFIG_CMDLINE
-			cmdline = CONFIG_CMDLINE_STR;
-#endif
-#else
+#ifndef CONFIG_CMDLINE_STR
 #if !CONFIG_CMDLINE
 			cmdline = (char*)(ptr+8);
 #else
@@ -158,10 +145,17 @@ void kmain(int magic, uint32_t *mbi) {
 		}
 		ptr += (*(uint32_t*)(ptr+4)+7) & ~7;
 	}
-	//printk(6, "---BEGIN Command line info---");
+#ifdef CONFIG_CMDLINE_STR
+#if CONFIG_CMDLINE
+	cmdline = CONFIG_CMDLINE_STR;
+#else
+#error "possible config corruption"
+#endif
+#endif
+	printk(6, "---BEGIN Command line info---");
 	parse_cmdline(cmdline);
-	//printk(4, "Parsed command line provided by bootloader");
-	//printk(6, "--- END Command line info ---");
+	printk(4, "Parsed command line provided by bootloader");
+	printk(6, "--- END Command line info ---");
 	printk(0, "Hello, hello!");
 	printk(0, "%x %x %x %x", (uint32_t)mbi_old, (uint32_t)mbi, (uint32_t)ptr, (uint32_t)can_font_init);
 	/*if (!(mbi->flags & (1<<12))) {

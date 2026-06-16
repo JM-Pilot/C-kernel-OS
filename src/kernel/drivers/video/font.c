@@ -8,10 +8,10 @@
 #define T_CHAR_HEIGHT 16
 
 typedef struct {
-	unsigned char c;
 	uint32_t fg;
 	uint32_t bg;
-	char dirty;
+	unsigned char dirty;
+	unsigned char c;
 } term_cell_t;
 
 static term_cell_t terminal[350*100] = {0};
