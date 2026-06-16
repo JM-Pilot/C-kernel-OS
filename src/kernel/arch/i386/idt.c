@@ -1,12 +1,12 @@
-#include <vga.h>
-#include <idt.h>
-#include <panic.h>
-#include <kb.h>
-#include <port.h>
-#include <globals.h>
-#include <pit.h>
+#include <drivers/video/vga.h>
+#include <arch/i386/idt.h>
+#include <sys/panic.h>
+#include <drivers/input/kb.h>
+#include <arch/i386/port.h>
+#include <sys/globals.h>
+#include <drivers/timers/pit.h>
 #include <string.h>
-#include <serial.h>
+#include <drivers/uart/serial.h>
 #include <generated/config.h>
 
 idt_entry_t idt_ents[256];

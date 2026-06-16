@@ -1,25 +1,25 @@
-#include <globals.h> // Globals
-#include <vga.h> // Display characters and string
-#include <kb.h> // Keyboard functions (deprecated outside IDT)
+#include <sys/globals.h> // Globals
+#include <drivers/video/vga.h> // Display characters and string
+#include <drivers/input/kb.h> // Keyboard functions (deprecated outside IDT)
 #include <string.h> // String tools
-#include <panic.h> // Critical errors
+#include <sys/panic.h> // Critical errors
 #include <stdlib.h> // Number to string functions
-#include <serial.h> // Serial I/O
-#include <power.h> // Power options
-#include <port.h> // Port I/O
-#include <multiboot.h> // Multiboot info for command line
-#include <idt.h> // Interrupt handling
-#include <gdt.h> // Required for IDT
-#include <pit.h> // Programmable Interval Timer
-#include <pic.h> // PIC
+#include <drivers/uart/serial.h> // Serial I/O
+#include <drivers/power/power.h> // Power options
+#include <arch/i386/port.h> // Port I/O
+#include <sys/multiboot.h> // Multiboot info for command line
+#include <arch/i386/idt.h> // Interrupt handling
+#include <arch/i386/gdt.h> // Required for IDT
+#include <drivers/timers/pit.h> // Programmable Interval Timer
+#include <arch/i386/pic.h> // PIC
 #include <generated/__GENVER.h> // Build info
-#include <cpu.h> // CPU vendor string
+#include <arch/i386/cpu.h> // CPU vendor string
 #include <generated/__BLD.h> // Build number
 #include <stddef.h> // Stuff like uint8_t
-#include <font.h> // Framebuffer functions
+#include <drivers/video/font.h> // Framebuffer functions
 #include <generated/config.h> // Kernel config (obviously)
-#include <pcspkr.h>
-#include <math.h>
+#include <drivers/audio/pcspkr.h>
+#include <math/math.h>
 
 static fb_info_t fb_info_real;
 static color_info_t color_info_real;

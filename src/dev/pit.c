@@ -1,8 +1,8 @@
-#include <pit.h>
-#include <vga.h>
-#include <port.h>
+#include <drivers/timers/pit.h>
+#include <drivers/video/vga.h>
+#include <arch/i386/port.h>
 #include <stdlib.h>
-#include <globals.h>
+#include <sys/globals.h>
 
 #define MAX_LEN_NOP "\
 		data16 data16 data16 data16 \

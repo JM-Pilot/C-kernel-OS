@@ -1,5 +1,22 @@
-CCFLAGS = -target i386-elf -fno-pie -fno-pic -Wunused -Wall -Wextra
-CCFLAGSC = -ffreestanding -target i386-elf -fno-exceptions -fno-stack-protector -fno-align-functions -fno-pie -fno-pic -fno-unwind-tables -fno-asynchronous-unwind-tables -I include -nostdlib -Wall -Wextra -fno-ident -Wunused -O3 -msse2
+CCFLAGS = \
+ -target i386-elf \
+ -fno-pie -fno-pic \
+ -Wunused -Wall -Wextra \
+ -Iinclude/lib -Iinclude/kernel
+
+CCFLAGSC = -ffreestanding \
+           -target i386-elf \
+	   -fno-exceptions \
+	   -fno-stack-protector \
+	   -fno-align-functions \
+	   -fno-pie \
+	   -fno-pic \
+	   -fno-unwind-tables \
+	   -fno-asynchronous-unwind-tables \
+	   -I include \
+	   -I include/kernel \
+	   -I include/lib \
+	   -nostdlib -Wall -Wextra -fno-ident -Wunused -O3 -msse2
 SRC_C := $(shell find src -name '*.c')
 SRC_S := $(shell find src -name '*.s')
 SRC_ASM := $(shell find src -name '*.asm')
@@ -36,23 +53,24 @@ build:
 
 include/generated/config.h: .config | build
 	@echo "Config has been changed. Regenerating"
-	@scripts/gen_conf.sh $(MAJOR) $(MINOR) $(PATCH) "$(ADDITIONAL)"
+	scripts/gen_conf.sh $(MAJOR) $(MINOR) $(PATCH) "$(ADDITIONAL)"
 	@echo "Config regenerated"
 
+# the compiler has the authority to show its logs
 build/src/%.c.o: src/%.c include/generated/config.h | build
 	@mkdir -p $(dir $@)
 	@echo "Compiling $<"
-	@clang -c $< -o $@ $(CCFLAGSC)
+	clang -c $< -o $@ $(CCFLAGSC)
 
 build/src/%.s.o: src/%.s | build
 	@mkdir -p $(dir $@)
 	@echo "Assembling $<"
-	@clang -c $< -o $@ $(CCFLAGS)
+	clang -c $< -o $@ $(CCFLAGS)
 
 build/src/%.asm.o: src/%.asm | build
 	@mkdir -p $(dir $@)
 	@echo "Assembling $<"
-	@nasm -f elf32 $< -o $@
+	nasm -f elf32 $< -o $@
 
 build/font_file.o: fonts/default_8x16.psf | build
 	@echo "Creating font object"

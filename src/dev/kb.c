@@ -3,11 +3,11 @@
  * thanks a lot for the inspiration to make a kernel!
  */
 
-#include <port.h>
-#include <kb.h>
-#include <serial.h>
+#include <arch/i386/port.h>
+#include <drivers/input/kb.h>
+#include <drivers/uart/serial.h>
 #include <stddef.h>
-#include <globals.h>
+#include <sys/globals.h>
 #include <generated/config.h>
 
 #if CONFIG_PS2_KB

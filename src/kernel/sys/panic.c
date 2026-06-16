@@ -1,10 +1,10 @@
-#include <vga.h>
-#include <panic.h>
+#include <drivers/video/vga.h>
+#include <sys/panic.h>
 #include <stddef.h>
 #include <stdarg.h>
-#include <idt.h> // regs_t
-#include <globals.h> // loglevel
-#include <font.h> // term flush
+#include <arch/i386/idt.h> // regs_t
+#include <sys/globals.h> // loglevel
+#include <drivers/video/font.h> // term flush
 
 // `__panic_` variables. they are defined here to avoid putting them in the stack
 

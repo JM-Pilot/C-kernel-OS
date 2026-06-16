@@ -1,4 +1,4 @@
-#include <math.h>
+#include <math/math.h>
 
 int sqrt(int n) {
 	if (n <= 0) return 0;

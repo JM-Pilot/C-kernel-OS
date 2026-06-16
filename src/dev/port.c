@@ -1,5 +1,5 @@
 #include "stdint.h"
-#include "port.h"
+#include <arch/i386/port.h>
 
 __attribute__((always_inline))
 inline uint8_t inb(uint16_t port) {

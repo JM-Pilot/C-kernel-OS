@@ -1,10 +1,10 @@
-#include <multiboot.h>
-#include <vga.h>
+#include <sys/multiboot.h>
+#include <drivers/video/vga.h>
 #include <stdint.h>
-#include <globals.h>
-#include <pit.h>
-#include <font.h>
-#include <panic.h>
+#include <sys/globals.h>
+#include <drivers/timers/pit.h>
+#include <drivers/video/font.h>
+#include <sys/panic.h>
 #include <generated/config.h>
 
 static fb_info_t framebuffer_info_real;

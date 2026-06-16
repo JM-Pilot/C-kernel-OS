@@ -1,8 +1,8 @@
-#include <font.h>
+#include <drivers/video/font.h>
 #include <stdint.h>
-#include <multiboot.h>
+#include <sys/multiboot.h>
 #include <string.h>
-#include <globals.h>
+#include <sys/globals.h>
 
 #define T_CHAR_WIDTH 8
 #define T_CHAR_HEIGHT 16
