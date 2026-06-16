@@ -1,4 +1,4 @@
-#include <globals.h>
+#include <sys/globals.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <generated/config.h>

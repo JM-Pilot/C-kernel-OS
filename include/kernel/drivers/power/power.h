@@ -1,6 +1,6 @@
-#include <port.h>
+#include <arch/i386/port.h>
 #include <stdint.h>
-#include <vga.h>
+#include <drivers/video/vga.h>
 
 int poweroff();
 int reboot();

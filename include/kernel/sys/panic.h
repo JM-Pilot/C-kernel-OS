@@ -1,9 +1,9 @@
 #pragma once
 #ifndef PANIC_H
 #define PANIC_H
-#include <vga.h>
+#include <drivers/video/vga.h>
 #include <stddef.h>
-#include <idt.h>
+#include <arch/i386/idt.h>
 extern regs_t *regs;
 extern int regs_available;
 void oops(const char *msg, ...);

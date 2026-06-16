@@ -1,15 +1,15 @@
 #include <stdint.h>
-#include <port.h>
+#include <arch/i386/port.h>
 #include <stdlib.h>
 #include <string.h>
-#include <globals.h>
-#include <serial.h>
-#include <vga.h>
+#include <sys/globals.h>
+#include <drivers/uart/serial.h>
+#include <drivers/video/vga.h>
 #include <stdarg.h>
 #include <limits.h>
-#include <pit.h>
-#include <multiboot.h>
-#include <font.h>
+#include <drivers/timers/pit.h>
+#include <sys/multiboot.h>
+#include <drivers/video/font.h>
 #include <generated/config.h>
 
 /* VGA table of colors

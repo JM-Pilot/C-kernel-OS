@@ -1,7 +1,7 @@
-#include <cpu.h>
+#include <arch/i386/cpu.h>
 #include <string.h>
 #include <cpuid.h> // first ever header outside CkOS to be included!
-#include <vga.h>
+#include <drivers/video/vga.h>
 #include <stdint.h>
 
 char *get_cpu_vendor_user() {

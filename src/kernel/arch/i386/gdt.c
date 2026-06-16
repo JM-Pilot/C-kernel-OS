@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <gdt.h>
+#include <arch/i386/gdt.h>
 
 gdt_ent_t gdt[3];
 gdt_ptr_t gdt_p;

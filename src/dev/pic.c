@@ -1,5 +1,5 @@
-#include <port.h>
-#include <pic.h>
+#include <arch/i386/port.h>
+#include <arch/i386/pic.h>
 
 void pic_remap() {
 	outb(0x20, 0x11);

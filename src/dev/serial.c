@@ -1,10 +1,10 @@
-#include <port.h>
+#include <arch/i386/port.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <serial.h>
-#include <globals.h>
+#include <drivers/uart/serial.h>
+#include <sys/globals.h>
 #include <stdlib.h>
-#include <vga.h>
+#include <drivers/video/vga.h>
 #include <generated/config.h>
 static unsigned short COM1 = 0x03F8;
 static unsigned short COM2 = 0x02F8;

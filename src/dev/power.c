@@ -1,10 +1,10 @@
-#include <port.h>
+#include <arch/i386/port.h>
 #include <stdint.h>
-#include <vga.h>
-#include <power.h>
-#include <serial.h>
-#include <pic.h>
-#include <pit.h>
+#include <drivers/video/vga.h>
+#include <drivers/power/power.h>
+#include <drivers/uart/serial.h>
+#include <arch/i386/pic.h>
+#include <drivers/timers/pit.h>
 
 static inline void outw(uint16_t port, uint16_t value) {
 	__asm__ volatile ("outw %0, %1" : : "a"(value), "Nd"(port));
