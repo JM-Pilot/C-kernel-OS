@@ -60,17 +60,17 @@ include/generated/config.h: .config | build
 build/src/%.c.o: src/%.c include/generated/config.h | build
 	@mkdir -p $(dir $@)
 	@echo "Compiling $<"
-	clang -c $< -o $@ $(CCFLAGSC)
+	@clang -c $< -o $@ $(CCFLAGSC)
 
 build/src/%.s.o: src/%.s | build
 	@mkdir -p $(dir $@)
 	@echo "Assembling $<"
-	clang -c $< -o $@ $(CCFLAGS)
+	@clang -c $< -o $@ $(CCFLAGS)
 
 build/src/%.asm.o: src/%.asm | build
 	@mkdir -p $(dir $@)
 	@echo "Assembling $<"
-	nasm -f elf32 $< -o $@
+	@nasm -f elf32 $< -o $@
 
 build/font_file.o: fonts/default_8x16.psf | build
 	@echo "Creating font object"
