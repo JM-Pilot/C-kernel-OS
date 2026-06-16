@@ -3,7 +3,9 @@ CCFLAGSC = -ffreestanding -target i386-elf -fno-exceptions -fno-stack-protector 
 SRC_C := $(shell find src -name '*.c')
 SRC_S := $(shell find src -name '*.s')
 SRC_ASM := $(shell find src -name '*.asm')
-OBJECTS := $(patsubst src/%.c,build/src/%.o,$(SRC_C)) $(patsubst src/%.s,build/src/%.o,$(SRC_S)) $(patsubst src/%.asm,build/src/%.o,$(SRC_ASM)) build/font_file.o
+OBJECTS := $(patsubst src/%.c,build/src/%.c.o,$(SRC_C)) \
+		$(patsubst src/%.s,build/src/%.s.o,$(SRC_S)) \
+		$(patsubst src/%.asm,build/src/%.asm.o,$(SRC_ASM)) build/font_file.o
 
 empty :=
 
@@ -37,15 +39,18 @@ include/generated/config.h: .config | build
 	@scripts/gen_conf.sh $(MAJOR) $(MINOR) $(PATCH) "$(ADDITIONAL)"
 	@echo "Config regenerated"
 
-build/src/%.o: src/%.c include/generated/config.h | build
+build/src/%.c.o: src/%.c include/generated/config.h | build
+	@mkdir -p $(dir $@)
 	@echo "Compiling $<"
 	@clang -c $< -o $@ $(CCFLAGSC)
 
-build/src/%.o: src/%.s | build
+build/src/%.s.o: src/%.s | build
+	@mkdir -p $(dir $@)
 	@echo "Assembling $<"
 	@clang -c $< -o $@ $(CCFLAGS)
 
-build/src/%.o: src/%.asm | build
+build/src/%.asm.o: src/%.asm | build
+	@mkdir -p $(dir $@)
 	@echo "Assembling $<"
 	@nasm -f elf32 $< -o $@
 
@@ -73,15 +78,15 @@ clean:
 	@echo "Cleaning..."
 	@rm -rf build iso/bootImage.elf include/generated/*.h
 
-qemu:
+run:
 	@echo "Running in QEMU"
 	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial mon:vc -serial stdio -vga std -global VGA.vgamem_mb=512 -cpu max
 
-qemu-vnc:
+run-vnc:
 	@echo "Running in QEMU (VNC 1)"
 	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial stdio -display vnc=:0 -d int -cpu max
 
-qemu-debug:
+run-debug:
 	@echo "Running in QEMU (highly debugged)"
 	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial stdio -d int,cpu,out_asm
 
