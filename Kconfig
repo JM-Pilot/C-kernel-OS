@@ -39,6 +39,9 @@ config PRINTK_TYPE
 config LOGO
 	bool "Show the CkOS text graphic at bootup"
 	default y
+config GLOGO
+	bool "Show the CkOS official logo at bootup"
+	default y
 config LOGLEVEL
 	int "Default loglevel (0-7)"
 	default 7

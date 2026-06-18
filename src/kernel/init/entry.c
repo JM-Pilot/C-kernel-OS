@@ -128,6 +128,7 @@ void kmain(int magic, uint32_t *mbi) {
 			if (fb_info->bpp == 32) can_font_init = 1;
 			// initialize framebuffer from data above
 			fb_init(fb_info, can_font_init);
+			draw_logo(fb_info);
 		} else if (*(uint32_t*)ptr == 1) {
 #ifndef CONFIG_CMDLINE_STR
 #if !CONFIG_CMDLINE

@@ -22,14 +22,16 @@ int t_height = 0;
 uint32_t pitch = 0;
 uint32_t pitchp = 0;
 uint32_t fb_bpp = 0;
+uint16_t logo_start_x = 0;
+uint16_t logo_start_y = 16;
 
-extern uint8_t _binary_fonts_default_8x16_psf_start[];
+extern uint8_t _binary_bin_default_8x16_psf_start[];
 static psf1_head_t *font_head;
 
 void clear_screen(); // required in order for font_init to call the function before its definition to avoid excessive code movement
 
 void font_init() {
-	font_head = (psf1_head_t*)_binary_fonts_default_8x16_psf_start;
+	font_head = (psf1_head_t*)_binary_bin_default_8x16_psf_start;
 	if (font_head->magic != PSF1_MAGIC) {
 		return;
 	}
@@ -38,11 +40,14 @@ void font_init() {
 	pitch = framebuffer_info->pitch;
 	fb_bpp = framebuffer_info->bpp;
 	pitchp = (pitch*8)/fb_bpp;
+#if CONFIG_GLOGO
+	logo_start_x = t_width-32;
+#endif
 	clear_screen();
 }
 
 void _putc(unsigned char c, int x, int y, uint32_t fg, uint32_t bg) {
-	uint8_t *glyph = (uint8_t*)_binary_fonts_default_8x16_psf_start+4+(c*font_head->char_size);
+	uint8_t *glyph = (uint8_t*)_binary_bin_default_8x16_psf_start+4+(c*font_head->char_size);
 	for (int r = 0; r < font_head->char_size; r++) {
 		uint32_t *row = framebuffer_info->fb+(y+r)*pitchp;
 		for (int s = 0; s < 8; s++) {
@@ -61,6 +66,9 @@ void redraw_term() {
 			_putc(c.c, x*T_CHAR_WIDTH, y*T_CHAR_HEIGHT, c.fg, c.bg);
 		}
 	}
+#if CONFIG_GLOGO
+	draw_logo(framebuffer_info);
+#endif
 }
 
 void clear_screen() {
@@ -76,12 +84,19 @@ void clear_screen() {
 }
 
 void flush_term() {
-	for (int y = 0; y < t_height; y++) {
-		for (int x = 0; x < t_width; x++) {
+	for (int y = 0; y < t_height; /*t_height*/ y++) {
+		for (int x = 0; x < t_width; /*t_width*/ x++) {
 			term_cell_t *c = &terminal[y*t_width+x];
 			if (!c->dirty) continue;
-			_putc(c->c, x*T_CHAR_WIDTH, y*T_CHAR_HEIGHT, c->fg,c->bg);
+#if CONFIG_GLOGO
+			if (x < logo_start_x || (x > logo_start_x && y > logo_start_y)) {
+				_putc(c->c, x*T_CHAR_WIDTH, y*T_CHAR_HEIGHT, c->fg, c->bg);
+				c->dirty = 0;
+			}
+#else
+			_putc(c->c, x*T_CHAR_WIDTH, y*T_CHAR_HEIGHT, c->fg, c->bg);
 			c->dirty = 0;
+#endif
 		}
 	}
 }

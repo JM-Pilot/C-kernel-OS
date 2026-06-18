@@ -80,6 +80,7 @@ void fb_demo_2(fb_info_t *fbi);
 void fb_demo_3(fb_info_t *fbi);
 void fb_demo_4(fb_info_t *fbi);
 void set_pixel(int x, int y, unsigned int color);
+void draw_logo(fb_info_t *fbi);
 
 extern fb_info_t *framebuffer_info;
 #endif

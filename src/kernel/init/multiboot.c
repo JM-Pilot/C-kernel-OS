@@ -225,6 +225,23 @@ void fb_init(fb_info_t *fbi, char can_font_init) {
 	return;
 }
 
+#if CONFIG_GLOGO
+extern uint8_t _binary_bin_logo_raw_start[];
+void draw_logo(fb_info_t *fbi) {
+	int startw = fbi->w-256;
+	uint32_t *pixels = (uint32_t*)_binary_bin_logo_raw_start;
+	for (int w_index = 0; w_index < 256; w_index++) {
+		for (int h_index = 0; h_index < 256; h_index++) {
+			((uint32_t*)fbi->fb)[h_index*fbi->w+(startw+w_index)] = pixels[h_index*256+w_index];
+		}
+	}
+}
+#else
+void draw_logo(fb_info_t *fbi) {
+	(void)fbi;
+}
+#endif
+
 void fb_debug_print(fb_info_t *fbi) {
 	printk(6, "Framebuffer is at %x", fbi->fb);
 	printk(6, "Size: %dx%dx%d", fbi->w, fbi->h, fbi->bpp);
