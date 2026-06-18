@@ -135,7 +135,10 @@ void kmain(int magic, uint32_t *mbi) {
 #else
 #error "possible config corruption"
 #endif
+#else
+			cmdline = CONFIG_CMDLINE_STR;
 #endif
+			parse_cmdline(cmdline);
 		} else if (*(uint32_t*)ptr == 2) {
 			printk(6, "Booting via %s", (char*)(ptr+8));
 		} else if (*(uint32_t*)ptr == 14) {
@@ -145,17 +148,13 @@ void kmain(int magic, uint32_t *mbi) {
 		}
 		ptr += (*(uint32_t*)(ptr+4)+7) & ~7;
 	}
-#ifdef CONFIG_CMDLINE_STR
-#if CONFIG_CMDLINE
-	cmdline = CONFIG_CMDLINE_STR;
-#else
-#error "possible config corruption"
-#endif
-#endif
 	printk(6, "---BEGIN Command line info---");
 	parse_cmdline(cmdline);
 	printk(4, "Parsed command line provided by bootloader");
 	printk(6, "--- END Command line info ---");
+	//printk(6, "---BEGIN Command line info---");
+	//printk(4, "Parsed command line provided by bootloader");
+	//printk(6, "--- END Command line info ---");
 	printk(0, "Hello, hello!");
 	printk(0, "%x %x %x %x", (uint32_t)mbi_old, (uint32_t)mbi, (uint32_t)ptr, (uint32_t)can_font_init);
 	/*if (!(mbi->flags & (1<<12))) {
