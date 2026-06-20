@@ -6,6 +6,7 @@
 #include <sys/globals.h> // loglevel
 #include <drivers/video/font.h> // term flush
 #include <generated/config.h>
+#include <string.h>
 
 // `__panic_` variables. they are defined here to avoid putting them in the stack
 
@@ -83,7 +84,6 @@ void oops(const char *msg, ...) {
 // in an event of a big update to panic
 
 void panic(const char *msg, ...) {
-	__asm__ volatile ("cli");
 	loglevel = 0; // don't even bother saving the old value. why? panic never returns?
 	/*puts("\n[ 0.000000] KERNEL PANIC: ");
 	puts(msg);
@@ -113,6 +113,7 @@ void panic(const char *msg, ...) {
 #else
 	set_color(0x000000AA, 0x00FFFFFF);
 #endif
+	__asm__ volatile ("cli");
 	msg3 = msg;
 	// first header
 	while (*__panic_pre && __panic_i < 1023) __panic_buf[__panic_i++] = *__panic_pre++;
@@ -127,7 +128,7 @@ void panic(const char *msg, ...) {
 		printk(0, "EAX: %x EBX: %x ECX: %x EDX: %x", regs->eax, regs->ebx, regs->ecx, regs->edx);
 		printk(0, "At %x:%x accessing %x:%x, EBP: %x, ESP: %x", regs->cs, regs->eip, regs->ds, regs->edi, regs->ebp, regs->esp);
 		printk(0, "EFLAGS: %x", regs->eflags);
-		printk(0, "Code: %x %x %x %x", *(int*)regs->eip, *((int*)(regs->eip)+4), *((int*)(regs->eip)+8), *((int*)(regs->eip)+12));
+		printk(0, "Code: %x %x %x %x", reverse(*(int*)regs->eip), reverse(*((int*)(regs->eip)+4)), reverse(*((int*)(regs->eip)+8)), reverse(*((int*)(regs->eip)+12)));
 	}
 	printk(0, "--- END Panic info ---");
 	// second header (or the end header)

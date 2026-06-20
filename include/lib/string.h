@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdint.h>
 int strcmp(const char *a, const char *b);
 int strncmp(const char *a, const char *b, unsigned int count);
 size_t strlen(const char *a);
@@ -11,3 +12,4 @@ int memcmp(const void *a, const void *b, size_t size);
 // WARNING: deprecated
 //int split(char *str, char sep, char *strings[], int stop);
 int strchr(char *str, char c);
+uint32_t reverse(uint32_t n);

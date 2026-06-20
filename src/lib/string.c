@@ -122,3 +122,7 @@ int strchr(char *str, char c) {
 	for (i = 0; str[i] && str[i] != c; i++);
 	return i;
 }
+
+uint32_t reverse(uint32_t n) {
+	return __builtin_bswap32(n);
+}
