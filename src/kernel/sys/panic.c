@@ -109,7 +109,7 @@ void panic(const char *msg, ...) {
 	clear_screen();
 	tx = 5; ty = 5;
 	printf("This machine ran into an irrecoverable error. See logs below for more information.\n");
-	tx = 0; ty = 15;
+	tx = 0; ty = 10;
 #else
 	set_color(0x000000AA, 0x00FFFFFF);
 #endif
