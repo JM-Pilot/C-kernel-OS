@@ -5,6 +5,7 @@
 #include <arch/i386/idt.h> // regs_t
 #include <sys/globals.h> // loglevel
 #include <drivers/video/font.h> // term flush
+#include <generated/config.h>
 
 // `__panic_` variables. they are defined here to avoid putting them in the stack
 
@@ -103,7 +104,15 @@ void panic(const char *msg, ...) {
 	panicking = 1;
 	va_list params;
 	va_start(params, msg);
+#if CONFIG_PRETTY_PANIC
+	set_color(0x00FFFF00, 0x00000000); // 0x000000AA, 0x00FFFFFF
+	clear_screen();
+	tx = 5; ty = 5;
+	printf("This machine ran into an irrecoverable error. See logs below for more information.\n");
+	tx = 0; ty = 15;
+#else
 	set_color(0x000000AA, 0x00FFFFFF);
+#endif
 	msg3 = msg;
 	// first header
 	while (*__panic_pre && __panic_i < 1023) __panic_buf[__panic_i++] = *__panic_pre++;

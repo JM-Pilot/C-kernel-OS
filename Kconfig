@@ -9,6 +9,9 @@ config CMDLINE_STR
 	default ""
 comment "Warning: the built-in command line will be always empty. If that's a mistake, disable CONFIG_CMDLINE"
 	depends on CMDLINE_STR = "" && CMDLINE
+config PRETTY_PANIC
+	bool "Make the panic screen more pretty"
+	default y
 endmenu
 menu "Visuals and aesthetic features"
 config ADDITIONAL_VER

@@ -17,8 +17,8 @@ extern volatile char kbc;
 extern volatile uint64_t uptime_ticks;
 extern unsigned char loglevel;
 extern char font_initialized;
-extern int fb_x;
-extern int fb_y;
+extern int tx;
+extern int ty;
 extern uint32_t fg_color;
 extern uint32_t bg_color;
 
