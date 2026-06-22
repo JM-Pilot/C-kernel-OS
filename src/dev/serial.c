@@ -31,21 +31,25 @@ void serial_init() {
 #if CONFIG_SERIAL
 		if (*(unsigned short *)0x400) {
 			COM1 = *(unsigned short *)0x400;
+			UART1 = COM1;
+		} else {
+			serial_com1 = 0;
 		}
 		if (*(unsigned short *)0x402) {
 			COM2 = *(unsigned short *)0x402;
+			UART2 = COM2;
+		} else {
+			serial_com1 = 0;
 		}
-		UART1 = COM1;
-		UART2 = COM2;
-		if (CONFIG_COM1) {
+		if (CONFIG_COM1 && UART1) {
 			__init_com_(COM1);
 			printk(5, "serial: Initialized COM1");
-			serial_com1 = 1;
+			serial_com1 = serial_com1 ? 1 : 0;
 		}
-		if (CONFIG_COM2) {
+		if (CONFIG_COM2 && UART2) {
 			__init_com_(COM2);
 			printk(5, "serial: Initialized COM2");
-			serial_com2 = 1;
+			serial_com2 = serial_com2 ? 1 : 0;
 		}
 #else
 		printk(4, "serial: not configured because support is disabled");

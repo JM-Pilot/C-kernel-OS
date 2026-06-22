@@ -22,8 +22,8 @@ const char *credits =
 "           you: for usage of this experimental OS\n";
 char serial_in = false; // true and false is defined in stdlib.h. while this is not the C standard, it makes you have to import less headers.
 char serial_out = false;
-char serial_com1 = false;
-char serial_com2 = false;
+char serial_com1 = true;
+char serial_com2 = true;
 volatile char kbc;
 // i'm sorry fellow C developers for this shitty solution but i just have to do this
 volatile uint64_t uptime_ticks = 0;

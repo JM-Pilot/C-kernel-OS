@@ -251,6 +251,12 @@ int cprintf(const char *restrict format, va_list parameters) {
 			if (maxrem < strlen(buf)) return -1;
 			if (!print(buf, strlen(buf))) return -1;
 			written += strlen(buf);
+		} else if (*format == 'u') {
+			format++; uint32_t value = va_arg(parameters, int);
+			char buf[12]; itoa(value, buf);
+			if (maxrem < strlen(buf)) return -1;
+			if (!print(buf, strlen(buf))) return -1;
+			written += strlen(buf);
 		} else {
 			format = format_begun_at;
 			size_t len = strlen(format);
