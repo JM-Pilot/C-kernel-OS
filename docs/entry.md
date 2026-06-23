@@ -10,3 +10,4 @@ There is more coming soon to this docs place - this is WIP.
 ## Sections
 - 1-drivers.md
 - 2-kernel-core.md
+- 3-preferences.md
