@@ -23,6 +23,7 @@ SRC_ASM := $(shell find src -name '*.asm')
 OBJECTS := $(patsubst src/%.c,build/src/%.c.o,$(SRC_C)) \
 		$(patsubst src/%.s,build/src/%.s.o,$(SRC_S)) \
 		$(patsubst src/%.asm,build/src/%.asm.o,$(SRC_ASM)) build/font_file.o build/logo.o
+OBJECTS := $(shell shuf -e $(OBJECTS) | tr '\n' ' ')
 
 empty :=
 
@@ -31,7 +32,7 @@ MINOR = 04
 PATCH = 2
 ADDITIONAL = $(empty)
 
-.PHONY: build
+#.PHONY: build
 
 all: build build/boot.iso.gz
 
@@ -56,7 +57,6 @@ include/generated/config.h: .config | build
 	@scripts/gen_conf.sh $(MAJOR) $(MINOR) $(PATCH) "$(ADDITIONAL)"
 	@echo "Config regenerated"
 
-# the compiler has the authority to show its logs
 build/src/%.c.o: src/%.c include/generated/config.h | build
 	@mkdir -p $(dir $@)
 	@echo "Compiling $<"
@@ -82,7 +82,7 @@ build/logo.o: bin/logo.raw | build
 
 build/bootImage.elf: $(OBJECTS)
 	@echo "Linking the kernel"
-	ld.lld -m elf_i386 -T kernel.ld $(OBJECTS) -o build/bootImage.unstripped.elf
+	@ld.lld -m elf_i386 -T kernel.ld $(OBJECTS) -o build/bootImage.unstripped.elf
 	@echo "Stripping the kernel"
 	@$(CROSS)strip -s build/bootImage.unstripped.elf -o build/bootImage.elf
 
