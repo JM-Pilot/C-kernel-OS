@@ -3,12 +3,12 @@
 #include <stdint.h>
 
 int strcmp(const char *a, const char *b) {
-	if (!a || !b) {
+	if (!a || !b) { // if the first char is not NUL
 		if (a == b) return 0;
 		return a ? 1 : -1;
 	}
 	size_t bytes = 0;
-	while (*a != '\0' && *a == *b && bytes < 16777216/32) { a++; b++; bytes++; }
+	while (*a != '\0' && *a == *b && bytes < 16777216/32) { a++; b++; bytes++; } // this shows how many chars before a difference occurs
 	return (*(unsigned char *)a) - (*(unsigned char *)b);
 }
 
@@ -18,13 +18,13 @@ int strncmp(const char *a, const char *b, unsigned int count) {
 		return a ? 1 : -1;
 	}
 	size_t bytes = 0;
-	while (*a != '\0' && *a == *b && bytes < 16777216/32 && bytes+1 < count) { a++; b++; bytes++; }
+	while (*a != '\0' && *a == *b && bytes < 16777216/32 && bytes+1 < count) { a++; b++; bytes++; } // counts until a difference or the character count is reached
 	return (*(unsigned char *)a) - (*(unsigned char *)b);
 }
 
 size_t strlen(const char *a) {
 	size_t bytes = 0;
-	while (a[bytes] != '\0' && bytes < 16777216/32) { bytes++; }
+	while (a[bytes] != '\0' && bytes < 16777216/32) { bytes++; } // almost how strncmp and strcmp count except it stops at the NUL byte not a difference
 	return bytes;
 }
 
@@ -108,8 +108,8 @@ void *memcpy(void *restrict to, const void *restrict from, size_t size) {
 }
 
 int memcmp(const void *a, const void *b, size_t size) {
-	const unsigned char *a_ = (const unsigned char*) a;
-	const unsigned char *b_ = (const unsigned char*) b;
+	const unsigned char *a_ = (const unsigned char*)a;
+	const unsigned char *b_ = (const unsigned char*)b;
 	for (size_t i = 0; i < size; i++) {
 		if (a_[i] < b_[i]) return -1;
 		if (b_[i] < a_[i]) return 1;
@@ -117,12 +117,12 @@ int memcmp(const void *a, const void *b, size_t size) {
 	return 0;
 }
 
-int strchr(char *str, char c) {
+int strchr(char *str, char c) { // returns the first occurence of c in str
 	int i = 0;
 	for (i = 0; str[i] && str[i] != c; i++);
 	return i;
 }
 
-uint32_t reverse(uint32_t n) {
+uint32_t reverse(uint32_t n) { // API for swapping a value cuz ain't no way __builtin_bswap32(n) is readable
 	return __builtin_bswap32(n);
 }

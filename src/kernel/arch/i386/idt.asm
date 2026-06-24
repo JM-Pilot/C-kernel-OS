@@ -18,7 +18,7 @@ isr%1:
 extern isr_handler
 
 common_isr:
-	pusha
+	pusha ; push all GPRs
 	mov ax, ds
 	push eax
 	mov ax, 0x10
@@ -26,7 +26,7 @@ common_isr:
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
-	push esp
+	push esp ; the pointer to the regs
 	call isr_handler
 	add esp, 4
 	pop eax
@@ -34,11 +34,11 @@ common_isr:
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
-	popa
+	popa ; pop all registers
 	add esp, 8
 	; generally, don't reenable interrupts. they might cause more problems if the faulty instruction
 	; triggers something again.
-	iret
+	iret ; rather unlikely yet to happen
 
 ISR_NO_CODE 0
 ISR_NO_CODE 1

@@ -15,7 +15,8 @@ char is_prime(int n) {
 	if (n <= 1) return 0;
 	if (n == 2) return 1;
 	if (!(n % 2)) return 0;
-	int max = sqrt(n);
+	int max = sqrt(n); // never calculate up to n and instead calculate up to sqrt(n)
+	// which saves calculation time
 	for (int i = 3; i <= max; i += 2) {
 		if (!(n % i)) return 0;
 	}

@@ -1,12 +1,14 @@
 .section .multiboot, "a"
 .align 8
 multiboot_header:
+# magic and start of tags
 .align 8
 .long 0xE85250D6
 .long 0
 .long multiboot_head_end - multiboot_header
 .long -(0xE85250D6+0+(multiboot_head_end-multiboot_header))
 
+# framebuffer request
 .align 8
 .short 5
 .short 0
@@ -15,6 +17,7 @@ multiboot_header:
 .long 1080
 .long 32
 
+# end tag
 .align 8
 .short 0
 .short 0
@@ -51,6 +54,8 @@ stack_top:
 .extern kmain
 .extern panic
 _start:
+	# enable SSE
+	mov %ecx, %eax # preserve the magic
 	mov %cr4, %eax
 	orl $0x600, %eax
 	mov %eax, %cr4
@@ -58,10 +63,12 @@ _start:
 	andl $0xFFFFFFFB, %eax
 	orl $0x0002, %eax
 	mov %eax, %cr0
+	# set up stack
 	mov $stack_top, %esp
 	cli
 	cld
 	nopw %cs:0x0(%eax,%eax,1)
+	# initialize the FPU
 	fwait
 	fninit
 	push $stat_boot_fpu_init
@@ -69,19 +76,20 @@ _start:
 	push $stat_boot_init
 	call printk
 	pop %ecx
-	push %ebx
-	push %eax
+	# push the arguments
+	push %ebx # mbi
+	push %ecx # magic
 	call kmain
 	push stat_kmain_return
 	call panic
 
 .section .rodata
 stat_kmain_return:
-.asciz "BAD C: `kmain` returned"
+.asciz "BAD C: `kmain` returned\0"
 stat_boot_init:
-.asciz "Boot stub: kernel initialized"
+.asciz "Boot stub: kernel initialized\0"
 stat_boot_fpu_init:
-.asciz "Boot stub: x87 FPU initialized"
+.asciz "Boot stub: x87 FPU initialized\0"
 .section .build_note, "a", @note
 .align 4
 .long 8

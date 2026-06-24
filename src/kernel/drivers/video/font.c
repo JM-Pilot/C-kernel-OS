@@ -17,8 +17,7 @@ typedef struct {
 static term_cell_t terminal[350*100] = {0};
 int t_width = 0;
 int t_height = 0;
-/*extern int fb_x;*/ int tx = 0;
-/*extern int fb_y;*/ int ty = 0;
+int tx = 0; int ty = 0;
 uint32_t pitch = 0;
 uint32_t pitchp = 0;
 uint32_t fb_bpp = 0;
@@ -52,7 +51,6 @@ void _putc(unsigned char c, int x, int y, uint32_t fg, uint32_t bg) {
 		uint32_t *row = framebuffer_info->fb+(y+r)*pitchp;
 		for (int s = 0; s < 8; s++) {
 			int p = (glyph[r] >> (7-s)) & 1;
-			//set_pixel(x+s, y+r, p ? fg : bg);
 			row[x+s] = p ? fg : bg;
 		}
 	}
@@ -84,8 +82,8 @@ void clear_screen() {
 }
 
 void flush_term() {
-	for (int y = 0; y < t_height; /*t_height*/ y++) {
-		for (int x = 0; x < t_width; /*t_width*/ x++) {
+	for (int y = 0; y < t_height; y++) {
+		for (int x = 0; x < t_width; x++) {
 			term_cell_t *c = &terminal[y*t_width+x];
 			if (!c->dirty) continue;
 #if CONFIG_GLOGO
@@ -107,7 +105,7 @@ void scroll_term() {
 		term_cell_t *c = &terminal[(t_height-1)*t_width+x];
 		c->c = ' '; c->fg = fg_color; c->bg = bg_color;
 	}
-	for (int i = 0; i < t_width*t_height; i++) terminal[i].dirty = 1; //(terminal[i].c != ' ');
+	for (int i = 0; i < t_width*t_height; i++) terminal[i].dirty = 1;
 	ty = t_height - 1; tx = 0;
 }
 
@@ -121,7 +119,7 @@ void put_char(char c) {
 		tx--;
 		terminal[ty*t_width+tx].fg = fg_color;
 		terminal[ty*t_width+tx].bg = bg_color;
-		terminal[ty*t_width+tx].dirty = terminal[ty*t_width+tx].c == ' ' ? 0 : 1; //terminal[ty*t_width+tx].dirty;
+		terminal[ty*t_width+tx].dirty = terminal[ty*t_width+tx].c == ' ' ? 0 : 1;
 		terminal[ty*t_width+tx].c = ' ';
 		return;
 	}

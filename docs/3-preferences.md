@@ -102,6 +102,18 @@ char *a; char *b = input;
 
 However, this may cause us to skip statements while debugging, so be really careful what you apply this to.
 
+For inline assembly, usually do:
+
+```c
+__asm__("# cool assembly here");
+```
+
+If it's volatile, put a space before the initial parenthesis.
+
+```c
+__asm__ volatile ("cli; hlt");
+```
+
 ### Assembly (GNU as)
 The GNU assembler is often called GNU ass because of the preference of AT&T syntax over Intel. I'm not here to point out which is better.
 
