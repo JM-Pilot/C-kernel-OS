@@ -21,4 +21,4 @@ const int compiler_ver[3] = {0, 0, 0};
 #endif
 
 kernel_id_t kernel_id_real;
-kernel_id_t *kernel_id = kernel_id_real;
+kernel_id_t *kernel_id = &kernel_id_real;

@@ -8,4 +8,5 @@ typedef struct {
 	char *additional_user;
 	char *additional_makefile;
 } kernel_id_t;
+extern kernel_id_t *kernel_id;
 #endif
