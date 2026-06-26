@@ -1,4 +1,6 @@
 #include <kernel/sys/globals.h>
+#include <generated/config.h>
+#include <id.h>
 
 #ifdef __STDC_VERSION__
 const int c_version = __STDC_VERSION__;
@@ -17,3 +19,6 @@ const int compiler_ver[3] = {__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__};
 const char *compiler = "unknown";
 const int compiler_ver[3] = {0, 0, 0};
 #endif
+
+kernel_id_t kernel_id_real;
+kernel_id_t *kernel_id = kernel_id_real;

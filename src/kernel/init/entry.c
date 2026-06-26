@@ -109,6 +109,11 @@ void kmain(int magic, uint32_t *mbi) {
 	set_post(0x3E);
 	uint32_t *mbi_old = mbi;
 	serial_init();
+	kernel_id->major = CONFIG_KERNEL_MAJOR;
+	kernel_id->minor = CONFIG_KERNEL_MINOR;
+	kernel_id->patch = CONFIG_KERNEL_PATCH;
+	kernel_id->additional_user = CONFIG_KERNEL_ADDITIONAL_VER;
+	kernel_id->additional_makefile = CONFIG_KERNEL_ADDITIONAL_MAKEFILE;
 	char *cmdline = NULL;
 	char can_font_init = 0;
 	uint8_t *ptr = (uint8_t*)mbi;
@@ -142,6 +147,7 @@ void kmain(int magic, uint32_t *mbi) {
 			parse_cmdline(cmdline);
 		} else if (*(uint32_t*)ptr == 2) {
 			printk(6, "Booting via %s", (char*)(ptr+8));
+			kernel_id->bootloader = (char*)(ptr+8);
 		} else if (*(uint32_t*)ptr == 14) {
 			unsigned char rsdp_sign[9] = {0};
 			memcpy(rsdp_sign, ptr+8, 8);
