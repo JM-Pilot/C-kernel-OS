@@ -20,6 +20,7 @@
 #include <generated/config.h> // Kernel config (obviously)
 #include <drivers/audio/pcspkr.h>
 #include <math/math.h>
+#include <id.h> // kernel_id
 
 static fb_info_t fb_info_real;
 static color_info_t color_info_real;
