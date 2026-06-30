@@ -22,7 +22,7 @@ SRC_S := $(shell find src -name '*.s')
 SRC_ASM := $(shell find src -name '*.asm')
 OBJECTS := $(patsubst src/%.c,build/src/%.c.o,$(SRC_C)) \
 		$(patsubst src/%.s,build/src/%.s.o,$(SRC_S)) \
-		$(patsubst src/%.asm,build/src/%.asm.o,$(SRC_ASM)) build/font_file.o build/logo.o
+		$(patsubst src/%.asm,build/src/%.asm.o,$(SRC_ASM)) build/font_file.o build/logo.o build/initrd.o
 OBJECTS := $(shell shuf -e $(OBJECTS) | tr '\n' ' ')
 
 empty :=
@@ -79,6 +79,10 @@ build/font_file.o: bin/default_8x16.psf | build
 build/logo.o: bin/logo.raw | build
 	@echo "Building logo object"
 	@$(CROSS)objcopy -I binary -O elf32-i386 bin/logo.raw build/logo.o
+
+build/initrd.o: bin/initrd.cpio | build
+	@echo "Building initramfs"
+	@$(CROSS)objcopy -I binary -O elf32-i386 bin/initrd.cpio build/initrd.o
 
 build/bootImage.elf: $(OBJECTS)
 	@echo "Linking the kernel"
