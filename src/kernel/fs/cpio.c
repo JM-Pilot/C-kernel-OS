@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <sys/brainfuck.h>
 
 typedef struct {
 	char c_magic[6];
@@ -18,7 +19,7 @@ typedef struct {
 	char c_rdevminor[8];
 	char c_namesize[8];
 	char c_check[8];
-} cpio_head_t;
+} __attribute__((packed)) cpio_head_t;
 
 uint32_t atoh(const char *s, int len) {
 	uint32_t n = 0;
@@ -46,16 +47,20 @@ char list_files_cpio() {
 		if (memcmp(header->c_magic, "070701", 6) != 0) return 1; // invalid magic
 		int namesize = atoh(header->c_namesize, 8);
 		int filesize = atoh(header->c_filesize, 8);
-		printk(4, "cpio: namesize %d, filesize %d", namesize, filesize);
-		archive += sizeof(cpio_head_t);
+		if (!strcmp((const char *)(archive+110), "TRAILER!!!")) break; // TRAILER!!! is a file in
+			// a cpio archive that determines the end-of-archive because
+			// __binary_bin_initrd_cpio_end is not always present
+		printk(4, "cpio: /%s: namesize %d, filesize %d", archive+110, namesize, filesize);
+		archive += 110; // sizeof(cpio_head_t)
 		uint8_t *name = archive;
-		if (!strcmp((const char *)name, "TRAILER!!!")) break; // TRAILER!!! is a file in a cpio archive that determines the
-			// end-of-archive because __binary_bin_initrd_cpio_end is not always present
-		int header_skip = __align_4b(namesize+sizeof(cpio_head_t));
-		archive -= sizeof(cpio_head_t);
+		int header_skip = __align_4b(namesize+110);
+		archive -= 110;
 		archive += header_skip;
-		printk(4, "cpio: first 4B in file %s at offset %x: %x", name, archive, reverse(*(uint32_t*)archive));
-		archive += __align_4b(filesize) + header_skip;
+		if (!strcmp((const char *)name, "init")) {
+			printk(4, "Run /init");
+			brainfuck_interpret((char*)archive, filesize);
+		}
+		archive += __align_4b(filesize);
 	}
 	return 0;
 }

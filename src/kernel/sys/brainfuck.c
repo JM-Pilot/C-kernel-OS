@@ -5,13 +5,13 @@
 
 uint8_t brainfuck_memory[4096] = {0};
 
-void brainfuck_interpret(char *code) {
+void brainfuck_interpret(char *code, int len) {
 	char *pc = code;
 	unsigned char *memptr = brainfuck_memory;
 	unsigned char *memmin = brainfuck_memory;
 	unsigned char *memmax = brainfuck_memory+4095;
 	memset(brainfuck_memory, 0, 4096);
-	while (*pc) {
+	while (pc < code+len) {
 		switch (*pc) {
 			case '>':
 				if (memptr < memmax) memptr++;

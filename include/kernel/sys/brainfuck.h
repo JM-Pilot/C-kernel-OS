@@ -1,5 +1,5 @@
 #ifndef BRAINFUCK_H
 #define BRAINFUCK_H
-void brainfuck_interpret(char *code);
+void brainfuck_interpret(char *code, int len);
 #endif
 
