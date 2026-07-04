@@ -22,6 +22,7 @@
 #include <math/math.h>
 #include <id.h> // kernel_id
 #include <fs/cpio.h>
+#include <sys/brainfuck.h> // brainfuck_interpret()
 
 static fb_info_t fb_info_real;
 static color_info_t color_info_real;
@@ -241,6 +242,9 @@ void kmain(int magic, uint32_t *mbi) {
 	post_test_time = uptime_ticks;
 	printk(4, "CPU test passed, took %d ms for a 100 thousand prime number calculation loop", (post_test_time-pre_test_time)/10);
 	list_files_cpio();
+	printk(6, "---BEGIN Brainfuck demo---");
+	brainfuck_interpret("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.");
+	printk(6, "--- END Brainfuck demo ---");
 	printk(7, "Hello, World!");
 #ifdef CONFIG_LOGO
 #if CONFIG_LOGO
