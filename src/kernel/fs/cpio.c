@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <sys/brainfuck.h>
+#include <fs/cpio.h>
 
 typedef struct {
 	char c_magic[6];
@@ -63,4 +64,29 @@ char list_files_cpio() {
 		archive += __align_4b(filesize);
 	}
 	return 0;
+}
+
+cpio_inode_t read_file_cpio(char *filename) {
+	uint8_t *archive = _binary_bin_initrd_cpio_start;
+	cpio_inode_t file_inode = {.file = (void*)0, .size = 0};
+	for(;;) {
+		cpio_head_t *header = (cpio_head_t*)archive;
+		if (memcmp(header->c_magic, "070701", 6) != 0) break;
+		int namesize = atoh(header->c_namesize, 8);
+		int filesize = atoh(header->c_filesize, 8);
+		if (!strcmp((const char *)(archive+110), "TRAILER!!!")) break; // TRAILER!!! is a file in
+			// the archive that determines EOF
+		archive += 110; // sizeof(cpio_head_t)
+		uint8_t *name = archive;
+		int header_skip = __align_4b(namesize+110);
+		archive -= 110;
+		archive += header_skip;
+		if (!strcmp((const char *)name, filename)) {
+			file_inode.file = (void*)archive;
+			file_inode.size = filesize;
+			break;
+		}
+		archive += __align_4b(filesize);
+	}
+	return file_inode;
 }
