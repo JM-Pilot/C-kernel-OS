@@ -111,8 +111,7 @@ extern irq_handler
 ;esp_back resd 4
 common_irq:
 	cld
-	;pusha ; push GPRs
-	;mov [esp_back], esp
+	; save registerse
 	push eax
 	push ecx
 	push edx
@@ -129,14 +128,9 @@ common_irq:
 	mov es, ax
 	push esp
 	call irq_handler
-	add esp, 4
-	;pop eax
-	;mov ds, ax
-	;mov es, ax
-	;mov fs, ax
-	;mov gs, ax
-	;popa
-	add esp, 4
+	; restore registers
+	add esp, 8
+	; ; ; ; ; ; ;
 	pop edi
 	pop esi
 	pop ebp
@@ -146,5 +140,6 @@ common_irq:
 	pop ecx
 	pop eax
 	add esp, 8
+
 	iret ; NOT just ret - remember, we're in an int
 

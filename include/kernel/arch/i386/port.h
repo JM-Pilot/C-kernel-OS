@@ -2,10 +2,28 @@
 #define PORT_H
 #include <stdint.h>
 
-uint8_t inb(uint16_t port);
-void outb(uint16_t port, uint8_t data);
-void wait_port();
-void set_post(uint8_t value);
+__attribute__((always_inline))
+static inline uint8_t inb(uint16_t port) {
+        uint8_t data;
+        __asm__ volatile ("inb %1, %0" : "=a" (data) : "dN" (port));
+        return data;
+}
+
+__attribute__((always_inline))
+static inline void outb(uint16_t port, uint8_t data) {
+        __asm__ volatile ("outb %0, %1" : : "a" (data), "dN" (port));
+}
+
+__attribute__((always_inline))
+static inline void wait_port() {
+        __asm__ volatile ("outb %%al, $0x80" : : "a"(0));
+}
+
+__attribute__((always_inline))
+static inline void set_post(uint8_t value) {
+        outb(0x80, value);
+}
+
 static inline void sti() {
 	__asm__ volatile ("sti");
 }
