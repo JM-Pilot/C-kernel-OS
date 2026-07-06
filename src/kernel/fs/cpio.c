@@ -57,11 +57,8 @@ char list_files_cpio() {
 		int header_skip = __align_4b(namesize+110);
 		archive -= 110;
 		archive += header_skip;
-		if (!strcmp((const char *)name, "init")) {
-			printk(4, "Run /init");
-			brainfuck_interpret((char*)archive, filesize);
-		}
 		archive += __align_4b(filesize);
+		(void)name; // unused
 	}
 	return 0;
 }

@@ -167,6 +167,18 @@ void kmain(int magic, uint32_t *mbi) {
 	//printk(6, "--- END Command line info ---");
 	printk(0, "Hello, hello!");
 	printk(0, "%x %x %x %x", (uint32_t)mbi_old, (uint32_t)mbi, (uint32_t)ptr, (uint32_t)can_font_init);
+	gdt_init();
+	printk(6, "GDT initialized");
+	pic_remap();
+	printk(6, "Remapped the PIC");
+	init_idt();
+	printk(6, "IDT initialized");
+	init_pit();
+	printk(6, "Initialized PIT at 10 KHz");
+	__asm__ volatile ("sti");
+	printk(6, "Set interrupts");
+	printk(7, "isr6(): %x", isr6);
+	printk(7, "isr0(): %x", isr0);
 	/*if (!(mbi->flags & (1<<12))) {
 		for (int i = 0; *no_fb_err; i++) {
 			vga_old_putc(*no_fb_err++, i);
@@ -204,18 +216,6 @@ void kmain(int magic, uint32_t *mbi) {
 	}*/
 	kb_init();
 	printk(6, "Initialized PS/2 BIOS keyboard");
-	gdt_init();
-	printk(6, "GDT initialized");
-	pic_remap();
-	printk(6, "Remapped the PIC");
-	init_idt();
-	printk(6, "IDT initialized");
-	init_pit();
-	printk(6, "Initialized PIT at 10 KHz");
-	__asm__ volatile ("sti");
-	printk(6, "Set interrupts");
-	printk(7, "isr6(): %x", isr6);
-	printk(7, "isr0(): %x", isr0);
 	printk(7, "CPU: %s", get_cpu_vendor());
 	// get_cpu_vendor in cpu.asm is a simple assembly function that uses cpuid with eax = 0
 	// which puts the max eax value in eax and the CPU vendor in ebx, edx and ecx in order.
@@ -244,6 +244,11 @@ void kmain(int magic, uint32_t *mbi) {
 	list_files_cpio();
 	cpio_inode_t init_inode = read_file_cpio("welcome");
 	if (init_inode.file) print(init_inode.file, init_inode.size);
+	init_inode = read_file_cpio("init");
+	if (init_inode.file) {
+		printk(4, "Run /init");
+		brainfuck_interpret(init_inode.file, init_inode.size);
+	}
 	//printk(6, "---BEGIN Brainfuck demo---");
 	//brainfuck_interpret("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.");
 	//printk(6, "--- END Brainfuck demo ---");
