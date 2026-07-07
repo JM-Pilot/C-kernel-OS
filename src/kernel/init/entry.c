@@ -23,6 +23,7 @@
 #include <id.h> // kernel_id
 #include <fs/cpio.h>
 #include <sys/brainfuck.h> // brainfuck_interpret()
+#include <fs/vfs.h>
 
 static fb_info_t fb_info_real;
 static color_info_t color_info_real;
@@ -252,6 +253,10 @@ void kmain(int magic, uint32_t *mbi) {
 	//printk(6, "---BEGIN Brainfuck demo---");
 	//brainfuck_interpret("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.");
 	//printk(6, "--- END Brainfuck demo ---");
+	printk(4, "hello/hello.txt with cwd /home/user: %s", resolve_path("hello/hello.txt", "/home/user"));
+	init_cpio();
+	printk(4, "Initialized cpio filesystem");
+	printk(4, "/init: %d bytes", read("/init", 5).size);
 	printk(7, "Hello, World!");
 #ifdef CONFIG_LOGO
 #if CONFIG_LOGO

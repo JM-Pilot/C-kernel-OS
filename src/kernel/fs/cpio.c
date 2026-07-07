@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <sys/brainfuck.h>
 #include <fs/cpio.h>
+#include <fs/vfs.h>
 
 typedef struct {
 	char c_magic[6];
@@ -66,6 +67,7 @@ char list_files_cpio() {
 cpio_inode_t read_file_cpio(char *filename) {
 	uint8_t *archive = _binary_bin_initrd_cpio_start;
 	cpio_inode_t file_inode = {.file = (void*)0, .size = 0};
+	if (*filename == '/') filename++;
 	for(;;) {
 		cpio_head_t *header = (cpio_head_t*)archive;
 		if (memcmp(header->c_magic, "070701", 6) != 0) break;
@@ -86,4 +88,45 @@ cpio_inode_t read_file_cpio(char *filename) {
 		archive += __align_4b(filesize);
 	}
 	return file_inode;
+}
+
+file_t cpio_read(char *path) {
+	file_t file_obj = {0};
+	file_obj.offset = 0;
+	cpio_inode_t cpio_inode = read_file_cpio(path);
+	file_obj.data = cpio_inode.file;
+	file_obj.size = cpio_inode.size;
+	file_obj.name = path;
+	printk(4, "cpio: size %d name %s", file_obj.size, file_obj.name);
+	return file_obj;
+}
+
+int cpio_write(file_t *file_obj, void *data, int size) {
+	(void)file_obj; (void)data;
+	(void)size;
+	return 1;
+}
+
+int cpio_mount(struct filesystem cpio_fs) {
+	(void)cpio_fs;
+	return 0;
+}
+
+int cpio_unmount(struct filesystem cpio_fs) {
+	(void)cpio_fs;
+	return 0;
+}
+
+filesystem_t cpio_fs;
+void init_cpio(void) {
+	cpio_fs.read = cpio_read;
+	cpio_fs.write = cpio_write;
+	cpio_fs.mount = cpio_mount;
+	cpio_fs.unmount = cpio_unmount;
+	struct mount cpio_mountpoint;
+	cpio_mountpoint.path[0] = '/';
+	cpio_mountpoint.path[1] = 0;
+	cpio_mountpoint.fs = &cpio_fs;
+	cpio_fs.mountpoint = &cpio_mountpoint;
+	register_fs(&cpio_fs);
 }

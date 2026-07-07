@@ -36,7 +36,11 @@ ADDITIONAL = $(empty)
 
 all: build build/boot.iso.gz
 
-build:
+.version:
+	@echo "Running scripts/build_inc.sh"
+	@scripts/build_inc.sh
+
+build: .version
 	@echo "Create build/ subdirectories"
 	@mkdir -p build/src/dev build/src/kernel build/src/stdlib
 	@echo "Create include/generated/"
@@ -47,8 +51,6 @@ build:
 	@scripts/check_dirs.sh
 	@echo "Running scripts/gen_ver.sh"
 	@scripts/gen_ver.sh
-	@echo "Running scripts/build_inc.sh"
-	@scripts/build_inc.sh
 	@echo "Running scripts/gen_ver_ex.sh"
 	@scripts/gen_ver_ex.sh
 
