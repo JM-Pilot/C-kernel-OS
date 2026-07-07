@@ -243,13 +243,13 @@ void kmain(int magic, uint32_t *mbi) {
 	post_test_time = uptime_ticks;
 	printk(4, "CPU test passed, took %d ms for a 100 thousand prime number calculation loop", (post_test_time-pre_test_time)/10);
 	list_files_cpio();
-	cpio_inode_t init_inode = read_file_cpio("welcome");
-	if (init_inode.file) print(init_inode.file, init_inode.size);
-	init_inode = read_file_cpio("init");
+	file_t welcome_banner = read("welcome", -1);
+	if (welcome_banner.name) print(welcome_banner.name, welcome_banner.size);
+	/*init_inode = read_file_cpio("init");
 	if (init_inode.file) {
 		printk(4, "Run /init");
 		brainfuck_interpret(init_inode.file, init_inode.size);
-	}
+	}*/
 	//printk(6, "---BEGIN Brainfuck demo---");
 	//brainfuck_interpret("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.");
 	//printk(6, "--- END Brainfuck demo ---");
