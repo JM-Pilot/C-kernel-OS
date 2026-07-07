@@ -13,12 +13,14 @@ typedef struct file {
 	char *name;
 } file_t;
 typedef struct filesystem {
-	file_t(*read)(char*);
+	file_t(*read)(file_t*);
 	int(*write)(file_t*, void*, int);
-	int(*mount)(struct filesystem);
-	int(*unmount)(struct filesystem);
+	int(*mount)(struct filesystem*);
+	int(*unmount)(struct filesystem*);
 	struct mount *mountpoint;
 } filesystem_t;
 void register_fs(filesystem_t *fs);
 file_t read(char *path, uint32_t size);
+int write(file_t *file_obj, void *data, int size);
+int mount(struct filesystem *fs, char *path);
 #endif

@@ -256,7 +256,10 @@ void kmain(int magic, uint32_t *mbi) {
 	printk(4, "hello/hello.txt with cwd /home/user: %s", resolve_path("hello/hello.txt", "/home/user"));
 	init_cpio();
 	printk(4, "Initialized cpio filesystem");
-	printk(4, "/init: %d bytes", read("/init", 5).size);
+	file_t init = read("/init", 5);
+	printk(4, "Run /init (%d bytes)", init.size);
+	brainfuck_interpret(init.data, init.size);
+	printk(4, "write code %d", write(&init, "Hello, World!", 13));
 	printk(7, "Hello, World!");
 #ifdef CONFIG_LOGO
 #if CONFIG_LOGO

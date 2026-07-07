@@ -90,14 +90,12 @@ cpio_inode_t read_file_cpio(char *filename) {
 	return file_inode;
 }
 
-file_t cpio_read(char *path) {
-	file_t file_obj = {0};
+file_t cpio_read(file_t *file_obj_p) {
+	file_t file_obj = *file_obj_p;
 	file_obj.offset = 0;
-	cpio_inode_t cpio_inode = read_file_cpio(path);
+	cpio_inode_t cpio_inode = read_file_cpio(file_obj.name);
 	file_obj.data = cpio_inode.file;
 	file_obj.size = cpio_inode.size;
-	file_obj.name = path;
-	printk(4, "cpio: size %d name %s", file_obj.size, file_obj.name);
 	return file_obj;
 }
 
@@ -107,26 +105,29 @@ int cpio_write(file_t *file_obj, void *data, int size) {
 	return 1;
 }
 
-int cpio_mount(struct filesystem cpio_fs) {
+int cpio_mount(struct filesystem *cpio_fs) {
 	(void)cpio_fs;
 	return 0;
 }
 
-int cpio_unmount(struct filesystem cpio_fs) {
+int cpio_unmount(struct filesystem *cpio_fs) {
 	(void)cpio_fs;
 	return 0;
 }
 
-filesystem_t cpio_fs;
+static filesystem_t cpio_fs;
+static struct mount cpio_mountpoint;
 void init_cpio(void) {
 	cpio_fs.read = cpio_read;
 	cpio_fs.write = cpio_write;
 	cpio_fs.mount = cpio_mount;
 	cpio_fs.unmount = cpio_unmount;
-	struct mount cpio_mountpoint;
 	cpio_mountpoint.path[0] = '/';
 	cpio_mountpoint.path[1] = 0;
 	cpio_mountpoint.fs = &cpio_fs;
 	cpio_fs.mountpoint = &cpio_mountpoint;
 	register_fs(&cpio_fs);
+	printk(4, "Mounting initramfs at root...");
+	printk(6, "exit code: %d", mount(&cpio_fs, "/"));
+	printk(4, "done.");
 }
