@@ -243,8 +243,6 @@ void kmain(int magic, uint32_t *mbi) {
 	post_test_time = uptime_ticks;
 	printk(4, "CPU test passed, took %d ms for a 100 thousand prime number calculation loop", (post_test_time-pre_test_time)/10);
 	list_files_cpio();
-	file_t welcome_banner = read("welcome", -1);
-	if (welcome_banner.name) print(welcome_banner.name, welcome_banner.size);
 	/*init_inode = read_file_cpio("init");
 	if (init_inode.file) {
 		printk(4, "Run /init");
@@ -260,6 +258,8 @@ void kmain(int magic, uint32_t *mbi) {
 	printk(4, "Run /init (%d bytes)", init.size);
 	brainfuck_interpret(init.data, init.size);
 	printk(4, "write code %d", write(&init, "Hello, World!", 13));
+	file_t welcome_banner = read("/welcome", -1);
+	if (welcome_banner.data) print(welcome_banner.data, welcome_banner.size);
 	printk(7, "Hello, World!");
 #ifdef CONFIG_LOGO
 #if CONFIG_LOGO
