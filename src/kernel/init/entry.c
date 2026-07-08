@@ -242,7 +242,6 @@ void kmain(int magic, uint32_t *mbi) {
 	for (int i = 1; i < 100000; i++) (void)(is_prime(i));
 	post_test_time = uptime_ticks;
 	printk(4, "CPU test passed, took %d ms for a 100 thousand prime number calculation loop", (post_test_time-pre_test_time)/10);
-	list_files_cpio();
 	/*init_inode = read_file_cpio("init");
 	if (init_inode.file) {
 		printk(4, "Run /init");
