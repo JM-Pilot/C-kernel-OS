@@ -5,6 +5,7 @@
 #include <sys/brainfuck.h>
 #include <fs/cpio.h>
 #include <fs/vfs.h>
+#include <sys/panic.h>
 
 typedef struct {
 	char c_magic[6];
@@ -128,6 +129,8 @@ void init_cpio(void) {
 	cpio_fs.mountpoint = &cpio_mountpoint;
 	register_fs(&cpio_fs);
 	printk(4, "Mounting initramfs at root...");
-	printk(6, "exit code: %d", mount(&cpio_fs, "/"));
+	int mount_code = mount(&cpio_fs, "/");
+	printk(6, "exit code: %d", mount_code);
+	if (mount_code) panic("Failed to mount initramfs: %d", mount_code);
 	printk(4, "done.");
 }

@@ -19,7 +19,8 @@ typedef struct filesystem {
 	int(*unmount)(struct filesystem*);
 	struct mount *mountpoint;
 } filesystem_t;
-void register_fs(filesystem_t *fs);
+int register_fs(filesystem_t *fs);
+int unregister_fs(filesystem_t *fs);
 file_t read(char *path, uint32_t size);
 int write(file_t *file_obj, void *data, int size);
 int mount(struct filesystem *fs, char *path);

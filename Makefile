@@ -93,8 +93,8 @@ build/bootImage.elf: $(OBJECTS)
 	@$(CROSS)strip -s build/bootImage.unstripped.elf -o build/bootImage.elf
 
 build/boot.iso: build/bootImage.elf
-	@echo "Copying kernel"
-	@cp build/bootImage.elf iso
+	@echo "Copying kernels"
+	@cp build/bootImage.elf build/bootImage.unstripped.elf iso
 	@echo "Make bootable ISO"
 	@grub-mkrescue -d /usr/lib/grub/i386-pc -o build/boot.iso iso
 
@@ -108,15 +108,15 @@ clean:
 
 run:
 	@echo "Running in QEMU"
-	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial mon:vc -serial stdio -vga std -global VGA.vgamem_mb=512 -cpu max
+	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial mon:vc -serial stdio -vga std -global VGA.vgamem_mb=128 -cpu max
 
 run-vnc:
 	@echo "Running in QEMU (VNC 1)"
 	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial stdio -display vnc=:0 -d int -cpu max
 
 run-debug:
-	@echo "Running in QEMU (highly debugged)"
-	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial stdio -d int,cpu,out_asm
+	@echo "Running in QEMU (debugged)"
+	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial mon:vc -serial stdio -vga std -global VGA.vgamem_mb=128 -cpu max -s -S -display sdl
 
 menuconfig:
 	@kconfig-mconf Kconfig
