@@ -131,7 +131,7 @@ void print_term_distrib(void) {
     	"You should have received a copy of the GNU General Public License\n"
     	"along with this program.  If not, see <https://www.gnu.org/licenses/>.\n");
 }
-void kmain(int magic, uint32_t *mbi) {
+void _Noreturn kmain(int magic, uint32_t *mbi) {
 	(void)magic;
 	//volatile char* video = (volatile char*)0xB8000;
 	//video[0] = 'E';
@@ -363,8 +363,9 @@ void kmain(int magic, uint32_t *mbi) {
 				poweroff();
 				panic("Failed to power off; likely not a QEMU machine");
 			} else if (strncmp(command, "reboot", 6) == 0) {
+				printf("Hello, World!");
 				reboot();
-				__asm__ volatile ("hlt");
+				__asm__ volatile ("cli; hlt");
 				panic("Failed to reboot; unknown error");
 			} else if (strncmp(command, "halt", 4) == 0) {
 				printf("System halted. It is now safe to power off.\n");
@@ -395,6 +396,10 @@ void kmain(int magic, uint32_t *mbi) {
 				//printf("TSC-based clock speed: %d\n", clk_d);
 			} else if (strncmp(command, "oopstest", 8) == 0) {
 				oops("User-triggered oops");
+			} else if (strncmp(command, "reboot", 6) == 0) {
+				reboot();
+				__asm__ volatile ("cli; hlt");
+				panic("Failed to reboot; unknown error");
 			} else if (strncmp(command, "delaytest", 9) == 0) {
 				uint32_t ms_elapsed[3] = {0};
 				uint32_t time = uptime_ticks/10;
@@ -478,4 +483,6 @@ void kmain(int magic, uint32_t *mbi) {
 			continue;
 		}
 	}
+	printk(4, "Halting because we have nothing to do.");
+	halt();
 }

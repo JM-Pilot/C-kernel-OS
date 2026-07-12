@@ -13,13 +13,9 @@ int strcmp(const char *a, const char *b) {
 }
 
 int strncmp(const char *a, const char *b, unsigned int count) {
-	if (!a || !b) {
-		if (a == b) return 0;
-		return a ? 1 : -1;
-	}
-	size_t bytes = 0;
-	while (*a != '\0' && *a == *b && bytes < 16777216/32 && bytes+1 < count) { a++; b++; bytes++; } // counts until a difference or the character count is reached
-	return (*(unsigned char *)a) - (*(unsigned char *)b);
+	if (!a || !b) return -1;
+	while (*a && *b && *a == *b && count) { a++; b++; count--; }
+	return *a - *b;
 }
 
 size_t strlen(const char *a) {
