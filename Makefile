@@ -82,22 +82,25 @@ build/logo.o: bin/logo.raw | build
 	@echo "Building logo object"
 	@$(CROSS)objcopy -I binary -O elf32-i386 bin/logo.raw build/logo.o
 
+initrd: build/initrd.o
 build/initrd.o: bin/initrd.cpio | build
 	@echo "Building initramfs"
 	@$(CROSS)objcopy -I binary -O elf32-i386 bin/initrd.cpio build/initrd.o
 
+kernel: build/bootImage.elf
 build/bootImage.elf: $(OBJECTS)
 	@echo "Linking the kernel"
 	@ld.lld -m elf_i386 -T kernel.ld $(OBJECTS) -o build/bootImage.unstripped.elf
 	@echo "Stripping the kernel"
 	@$(CROSS)strip -s build/bootImage.unstripped.elf -o build/bootImage.elf
 
+iso: build/boot.iso
 build/boot.iso: build/bootImage.elf
 	@echo "Copying kernels"
 	@cp build/bootImage.elf build/bootImage.unstripped.elf iso
 	@echo "Make bootable ISO"
 	@grub-mkrescue -d /usr/lib/grub/i386-pc -o build/boot.iso iso
-
+isogz: build/boot.iso.gz
 build/boot.iso.gz: build/boot.iso
 	@echo "Compressing ISO for distribution"
 	@gzip -f9k build/boot.iso
@@ -106,15 +109,15 @@ clean:
 	@echo "Cleaning..."
 	@rm -rf build iso/bootImage.elf include/generated/*.h
 
-run:
+run: build/boot.iso
 	@echo "Running in QEMU"
 	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial mon:vc -serial stdio -vga std -global VGA.vgamem_mb=128 -cpu max
 
-run-vnc:
+run-vnc: build/boot.iso
 	@echo "Running in QEMU (VNC 1)"
 	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial stdio -display vnc=:0 -d int -cpu max
 
-run-debug:
+run-debug: build/boot.iso
 	@echo "Running in QEMU (debugged)"
 	@qemu-system-i386 -cdrom build/boot.iso -boot order=dca -nic none -serial mon:vc -serial stdio -vga std -global VGA.vgamem_mb=128 -cpu max -s -S -display sdl
 
