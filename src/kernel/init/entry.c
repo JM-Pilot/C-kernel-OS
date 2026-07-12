@@ -101,16 +101,14 @@ char command[256] = {0};
   If the program does terminal interaction, make it output a short
   notice like this when it starts in an interactive mode
  */
-void print_term_license(void)
-{
-	printf("C-Kernel-OS Copyright (C) 2026 orca-pet3910YT\n");
+void print_term_license(void) {
+	printf("C Kernel OS Copyright (C) 2026 orca-pet3910YT\n");
     	printf("This program comes with ABSOLUTELY NO WARRANTY; for details type 'wlicense'.\n");
     	printf("This is free software, and you are welcome to redistribute it\n");
     	printf("under certain conditions; type 'dlicense' for details.\n\n");
 }
 
-void print_term_warranty(void)
-{
+void print_term_warranty(void) {
 	printf("\tTHERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY\n"
 	"APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT\n"
 	"HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY\n"
@@ -121,8 +119,7 @@ void print_term_warranty(void)
 	"ALL NECESSARY SERVICING, REPAIR OR CORRECTION.\n");
 }
 
-void print_term_distrib(void)
-{
+void print_term_distrib(void) {
 	printf("	This program is free software: you can redistribute it and/or modify\n"
     	"it under the terms of the GNU General Public License as published by\n"
     	"the Free Software Foundation, either version 3 of the License, or\n"
@@ -314,7 +311,7 @@ void kmain(int magic, uint32_t *mbi) {
 	/* we would clear this because sometimes the cursor is at the very bottom and it is annoying */
 	clear_screen(); // comment this line if you dont want to clear
 	
-	printf("CkOS Kernel Shell, type 'help' for more info\n");
+	printf("CkOS kernel shell, type 'help' for more info\n");
 	int index = 0;
 	printf("$ ");
 	for (;;) {
