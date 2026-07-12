@@ -6,7 +6,7 @@
 
 #define T_CHAR_WIDTH 8
 #define T_CHAR_HEIGHT 16
-
+#define T_TABWIDTH 8
 typedef struct {
 	uint32_t fg;
 	uint32_t bg;
@@ -121,6 +121,10 @@ void put_char(char c) {
 		terminal[ty*t_width+tx].bg = bg_color;
 		terminal[ty*t_width+tx].dirty = terminal[ty*t_width+tx].c == ' ' ? 0 : 1;
 		terminal[ty*t_width+tx].c = ' ';
+		return;
+	}
+	if (c == '\t') {
+		tx = (tx + T_TABWIDTH) & ~(T_TABWIDTH - 1);
 		return;
 	}
 	if (ty >= t_height) scroll_term();
