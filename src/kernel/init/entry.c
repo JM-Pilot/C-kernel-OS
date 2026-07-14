@@ -247,4 +247,6 @@ void kmain(int magic, uint32_t *mbi) {
 		shell_cmd_loop();
 		/* do stuff */
 	}
+	printk(4, "Halting because we have nothing to do.");
+	halt();
 }
